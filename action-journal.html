@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation -->
     <header>
         <h1>Action Journal</h1>
         <nav>
@@ -19,70 +18,68 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main>
         <h2>Here are the latest workouts recorded in uphill skiing mecca San Diego</h2>
         <div class="post-container" id="post-container"></div>
-        <div class="pagination" id="pagination">
-            <button id="prev" disabled>Previous</button>
-            <span id="page-info"></span>
-            <button id="next">Next</button>
-        </div>
     </main>
 
-    <!-- Footer -->
     <footer>
         <p>&copy; 2024 San Diego Skimo Community</p>
     </footer>
 
-    <!-- Include the marked.js library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-    async function loadPosts() {
-        const container = document.getElementById("post-container");
-        const response = await fetch("posts/index.json");
+        async function loadPosts() {
+            const container = document.getElementById("post-container");
 
-        if (!response.ok) {
-            console.error("Failed to load posts");
-            return;
+            const response = await fetch("posts/index.json");
+            const posts = await response.json();
+
+            posts.slice(0, 5).forEach(post => { // Display 5 posts per page
+                fetch(`posts/${post.filename}`)
+                    .then(res => res.text())
+                    .then(markdown => {
+                        const metadata = extractPostMetadata(markdown);
+                        const postHTML = `
+                            <div class="post">
+                                <h3>${metadata.title}</h3>
+                                <p><strong>Date:</strong> ${metadata.date}</p>
+                                <p><strong>Distance:</strong> ${metadata.distance}</p>
+                                <p><strong>Elevation Gain:</strong> ${metadata.elevation}</p>
+                                <p><strong>Time:</strong> ${metadata.time}</p>
+                                <a href="posts/${post.filename}" class="cta-button">Read more</a>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', postHTML);
+                    });
+            });
         }
 
-        const posts = await response.json();
+        function extractPostMetadata(markdown) {
+            const metadata = {
+                title: "Unknown Title",
+                date: "Unknown Date",
+                distance: "N/A",
+                elevation: "N/A",
+                time: "N/A"
+            };
 
-        // Paginate: 5 posts per page
-        const params = new URLSearchParams(window.location.search);
-        const page = parseInt(params.get("page") || 1);
-        const postsPerPage = 5;
-        const start = (page - 1) * postsPerPage;
-        const end = start + postsPerPage;
-        const paginatedPosts = posts.slice(start, end);
+            const titleMatch = markdown.match(/title: "(.*?)"/);
+            const dateMatch = markdown.match(/date: (.*?)\n/);
+            const distanceMatch = markdown.match(/Distance\*\*: (.*?) miles/);
+            const elevationMatch = markdown.match(/Elevation Gain\*\*: (.*?) ft/);
+            const timeMatch = markdown.match(/Time\*\*: (.*?) minutes/);
 
-        // Clear and render posts
-        container.innerHTML = "";
-        paginatedPosts.forEach(post => {
-            const postHTML = `
-                <div class="post">
-                    <h2>${post.title}</h2>
-                    <p>Date: ${post.date}</p>
-                    <a href="posts/${post.filename}" target="_blank">Read more</a>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', postHTML);
-        });
+            if (titleMatch) metadata.title = titleMatch[1];
+            if (dateMatch) metadata.date = dateMatch[1];
+            if (distanceMatch) metadata.distance = distanceMatch[1] + " miles";
+            if (elevationMatch) metadata.elevation = elevationMatch[1] + " ft";
+            if (timeMatch) metadata.time = timeMatch[1] + " minutes";
 
-        // Pagination Controls
-        const totalPages = Math.ceil(posts.length / postsPerPage);
-        const paginationHTML = `
-            <div class="pagination">
-                ${page > 1 ? `<a href="?page=${page - 1}">Previous</a>` : ''}
-                ${page < totalPages ? `<a href="?page=${page + 1}">Next</a>` : ''}
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', paginationHTML);
-    }
+            return metadata;
+        }
 
-    loadPosts();
-</script>
-
+        loadPosts();
+    </script>
 </body>
 </html>
