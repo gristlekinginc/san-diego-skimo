@@ -80,45 +80,34 @@ def create_html(activity):
     description = activity.get("description", "No description provided")
     distance = round(activity["distance"] / 1609, 2)  # meters to miles
     elevation = round(activity["total_elevation_gain"], 1)
-    time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
+    time = round(activity["moving_time"] / 60, 1)
 
-    markdown_content = f"""# {title}
-**Date**: {date}
-
-## Stats
-- **Distance**: {distance} miles
-- **Elevation Gain**: {elevation} ft
-- **Time**: {time} minutes
-
-## Description
-{description}
-
-## Map
-[View Activity on Strava](https://www.strava.com/activities/{activity['id']})
+    # HTML content with structure
+    content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="post-container">
+        <h1>{title}</h1>
+        <p><strong>Date:</strong> {date}</p>
+        <p><strong>Distance:</strong> {distance} miles</p>
+        <p><strong>Elevation Gain:</strong> {elevation} ft</p>
+        <p><strong>Time:</strong> {time} minutes</p>
+        <h2>Description</h2>
+        <p>{description}</p>
+        <h2>Map</h2>
+        <p><a href="https://www.strava.com/activities/{activity['id']}" target="_blank">View Activity on Strava</a></p>
+    </div>
+</body>
+</html>
 """
-
-    # Convert Markdown to HTML
-    html_content = markdown.markdown(markdown_content)
-
-    # Wrap HTML in a template for styling
-    full_html = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{title}</title>
-        <link rel="stylesheet" href="../assets/css/style.css">
-    </head>
-    <body>
-        <div class="post">
-            {html_content}
-        </div>
-    </body>
-    </html>
-    """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
-    return filename, full_html
+    return filename, content
 
 # --- Generate index.json ---
 def generate_index(posts_dir):
