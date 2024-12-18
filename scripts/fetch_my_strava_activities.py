@@ -58,13 +58,26 @@ ACCESS_TOKEN = load_access_token()
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
-    print("Using Access Token:", ACCESS_TOKEN)  # Debug print
+    print("Using Access Token:", ACCESS_TOKEN)
     headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
     params = {"per_page": 30}
+    
     response = requests.get(url, headers=headers, params=params)
-    print("API Response Status Code:", response.status_code)  # Debug status
+    print("API Response Status Code:", response.status_code)
+    
+    if response.status_code == 401:
+        print("Error: Unauthorized. Check access token permissions.")
+        raise Exception("401 Unauthorized - Check access token or scope permissions.")
+    
     response.raise_for_status()
-    return response.json()
+    activities = response.json()
+
+    if not activities:
+        print("No activities returned by the API.")
+        return []
+
+    return activities
+
 
 
 def filter_roller_ski(activities):
@@ -107,15 +120,28 @@ tags: roller ski, san diego
 
 # --- Push to GitHub ---
 def push_to_github(files):
+    print("Repository Name:", REPO_NAME)
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
 
     for filepath, content in files:
         try:
-            repo.create_file(filepath, f"Add blog post for {filepath}", content)
-            print(f"Created: {filepath}")
+            existing_file = None
+            try:
+                # Check if the file already exists
+                existing_file = repo.get_contents(filepath)
+            except Exception:
+                pass  # File does not exist
+            
+            if existing_file:
+                repo.update_file(filepath, f"Update blog post for {filepath}", content, existing_file.sha)
+                print(f"Updated: {filepath}")
+            else:
+                repo.create_file(filepath, f"Add blog post for {filepath}", content)
+                print(f"Created: {filepath}")
         except Exception as e:
-            print(f"Error creating {filepath}: {e}")
+            print(f"Error creating/updating {filepath}: {e}")
+
 
 # --- Main ---
 if __name__ == "__main__":
