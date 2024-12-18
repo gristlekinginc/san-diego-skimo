@@ -6,6 +6,7 @@
     <title>Action Journal</title>
     <!-- Link to your external CSS file -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- For Markdown parsing -->
 </head>
 <body>
     <!-- Header Section -->
@@ -22,22 +23,20 @@
     <!-- Main Content -->
     <main>
         <h1>Action Journal</h1>
-        <div class="post-container" id="post-container">
-            <!-- Posts will be dynamically loaded here -->
-        </div>
+        <div class="post-container" id="post-container"></div>
     </main>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 San Diego Skimo. All rights reserved.</p>
+        <p>&copy; 2024 San Diego Skimo Community</p>
     </footer>
 
-    <!-- Script for Loading Posts -->
+    <!-- Script for Loading and Parsing Posts -->
     <script>
         async function loadPosts() {
             const container = document.getElementById("post-container");
 
-            // Simulated list of posts from the 'posts' directory
+            // List of posts (simulate server files)
             const posts = [
                 "2024-12-18-roller-ski-the-15-incline-to-adams.md",
                 "2024-12-06-a-tentative-foray-into-ski-hill-training.md",
@@ -53,16 +52,11 @@
                     const response = await fetch(`posts/${post}`);
                     if (response.ok) {
                         const content = await response.text();
-
-                        // Extract title and content
-                        const lines = content.split('\n');
-                        const titleLine = lines.find(line => line.startsWith('title:'));
-                        const title = titleLine ? titleLine.replace('title: ', '').replace(/"/g, '') : "Untitled Post";
+                        const parsedHTML = marked.parse(content); // Convert Markdown to HTML
 
                         const postHTML = `
                             <div class="post">
-                                <h2>${title}</h2>
-                                <pre>${lines.slice(5).join('\n')}</pre>
+                                ${parsedHTML}
                             </div>
                         `;
                         container.innerHTML += postHTML;
