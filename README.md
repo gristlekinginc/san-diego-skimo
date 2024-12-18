@@ -1,7 +1,7 @@
 
 # San Diego Skimo Community Website
 
-This is a starter template for the San Diego Skimo community website. It includes:
+I thought it'd be fun to build a little website for San Diego Skimo.  This is just a record of that starting point of the build.
 
 - A Home Page
 - Action Journal (blog) page
