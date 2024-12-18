@@ -117,9 +117,20 @@ def generate_index(posts_dir):
             parts = filename.replace('.html', '').split('-')
             date = '-'.join(parts[:3])  # Extract YYYY-MM-DD
             title = ' '.join(parts[3:]).capitalize()
+
+            # Extract metadata directly from HTML file
+            with open(os.path.join(posts_dir, filename), "r") as f:
+                content = f.read()
+                distance = extract_metadata(content, "Distance:")
+                elevation = extract_metadata(content, "Elevation Gain:")
+                time = extract_metadata(content, "Time:")
+
             posts.append({
                 "title": title,
                 "date": date,
+                "distance": distance,
+                "elevation": elevation,
+                "time": time,
                 "filename": filename
             })
 
@@ -128,6 +139,13 @@ def generate_index(posts_dir):
     with open(os.path.join(posts_dir, "index.json"), "w") as f:
         json.dump(posts, f, indent=4)
     print("Generated index.json successfully!")
+
+def extract_metadata(content, key):
+    """Extract metadata value for a given key from HTML content."""
+    import re
+    match = re.search(f"<p><strong>{key}</strong> (.*?)</p>", content)
+    return match.group(1) if match else "N/A"
+
 
 # --- Push to GitHub ---
 def push_to_github(files):
