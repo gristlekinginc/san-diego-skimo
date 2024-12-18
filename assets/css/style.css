@@ -73,7 +73,7 @@ p {
     padding: 10px 20px;
     font-size: 1.2em;
     color: #00ff00; /* Green text */
-    background-color: transparent; /* Transparent background */
+    background-color: transparent; /* Transparent background by default */
     text-decoration: none;
     border: 2px solid #00ff00; /* Green border */
     border-radius: 5px;
@@ -82,13 +82,14 @@ p {
 }
 
 .cta-button:hover {
-    color: #000; /* Black text for hover */
-    background-color: transparent; /* Keep background transparent */
-    border-color: #00ff00; /* Keep border green */
-    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00; /* Glow effect */
-    transform: scale(1.05); /* Slightly enlarge the button */
+    color: #000; /* Black text on hover */
+    background-color: transparent; /* No background even on hover */
+    border-color: #00ff00; /* Keep the green border */
+    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00; /* Glow effect on hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
     cursor: pointer; /* Pointer cursor for interaction */
 }
+
 
 /* Footer */
 footer {
