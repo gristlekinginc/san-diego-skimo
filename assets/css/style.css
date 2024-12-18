@@ -72,25 +72,22 @@ p {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    color: #ff00ff; /* Hot pink text */
+    color: #ff00ff; /* Hot pink text for clarity */
     background-color: transparent; /* Transparent background */
     text-decoration: none;
     border: 2px solid #ff00ff; /* Hot pink border */
     border-radius: 5px;
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
-    text-align: center;
+    transition: all 0.3s ease; /* Smooth transition */
 }
 
 .cta-button:hover {
-    color: #00ff00; /* Green text */
+    color: #00ff00; /* Green text on hover */
     background-color: transparent; /* Transparent background */
-    border-color: #00ff00; /* Green border */
-    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00; /* Green glow effect */
+    border-color: #00ff00; /* Green border on hover */
+    box-shadow: 0 0 8px #00ff00; /* Green glow effect */
     transform: scale(1.05); /* Slightly enlarge */
     cursor: pointer; /* Pointer cursor */
 }
-
-
 
 /* Footer */
 footer {
