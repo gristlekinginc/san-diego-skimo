@@ -94,6 +94,7 @@ def filter_roller_ski(activities):
 def create_markdown(activity):
     date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
     title = activity["name"]
+    description = activity.get("description", "No description provided")  # Extract the description
     distance = round(activity["distance"] / 1609, 2)  # meters to miles
     elevation = round(activity["total_elevation_gain"], 1)
     time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
@@ -101,7 +102,6 @@ def create_markdown(activity):
     content = f"""---
 title: "{title}"
 date: {date}
-description = activity.get("description", "No description provided")
 tags: roller ski, san diego
 ---
 
@@ -110,11 +110,15 @@ tags: roller ski, san diego
 - **Elevation Gain**: {elevation} ft
 - **Time**: {time} minutes
 
+### Description
+{description}
+
 ### Map
 [View Activity on Strava](https://www.strava.com/activities/{activity['id']})
 """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
     return filename, content
+
   
 
 # --- Push to GitHub ---
