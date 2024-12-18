@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
-  contents: write  # Add this line
+  contents: write  # Allows the workflow to push changes to the repository
 
 jobs:
   fetch-and-push:
@@ -22,7 +22,8 @@ jobs:
         python-version: "3.x"
 
     - name: Install Dependencies
-      run: pip install requests PyGithub
+      run: |
+        pip install requests PyGithub markdown
 
     - name: Fetch and Push Activities
       env:
@@ -31,3 +32,9 @@ jobs:
         STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
         GITHUB_TOKEN: ${{ github.token }}
       run: python scripts/fetch_my_strava_activities.py
+
+    - name: Commit and Push Changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Update Strava posts with latest HTML and index"
+        file_pattern: "posts/*.html posts/index.json"
