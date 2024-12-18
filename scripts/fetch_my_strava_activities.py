@@ -7,7 +7,7 @@ from github import Github
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-REPO_NAME = "your-username/san-diego-skimo"  # Replace with your repo name
+REPO_NAME = "gristlekinginc/san-diego-skimo"  # Replace with your repo name
 POSTS_DIR = "posts"  # Directory for blog posts
 
 # San Diego County Bounding Box
