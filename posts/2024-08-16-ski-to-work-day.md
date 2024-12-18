@@ -9,5 +9,8 @@ tags: roller ski, san diego
 - **Elevation Gain**: 0.0 ft
 - **Time**: 12.5 minutes
 
+### Description
+No description provided
+
 ### Map
 [View Activity on Strava](https://www.strava.com/activities/12173217907)
