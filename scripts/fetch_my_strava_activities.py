@@ -4,6 +4,7 @@ import datetime
 from github import Github
 
 # --- Configuration ---
+TOKEN_FILE = "strava_tokens.json"
 STRAVA_ACCESS_TOKEN = os.getenv("STRAVA_ACCESS_TOKEN")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_NAME = "your-username/san-diego-skimo"  # Replace with your repo name
@@ -17,6 +18,38 @@ SAN_DIEGO_BOUNDS = {
     "ne_lng": -116.0856,  # Northeast longitude
 }
 
+# --- Refresh Access Token ---
+def refresh_access_token():
+    url = "https://www.strava.com/oauth/token"
+    payload = {
+        "client_id": os.getenv("STRAVA_CLIENT_ID"),
+        "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
+        "grant_type": "refresh_token",
+        "refresh_token": os.getenv("STRAVA_REFRESH_TOKEN"),
+    }
+
+    response = requests.post(url, data=payload)
+    response.raise_for_status()
+    tokens = response.json()
+
+    # Save updated tokens to file
+    with open(TOKEN_FILE, "w") as f:
+        json.dump(tokens, f)
+    
+    print("Access token refreshed successfully!")
+    return tokens["access_token"]
+
+# --- Load Access Token ---
+def load_access_token():
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, "r") as f:
+            tokens = json.load(f)
+        return tokens["access_token"]
+    return refresh_access_token()
+
+# Assign the ACCESS_TOKEN here
+ACCESS_TOKEN = load_access_token()
+
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
@@ -25,6 +58,7 @@ def fetch_my_activities():
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
+
 
 
 def filter_roller_ski(activities):
