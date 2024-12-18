@@ -82,7 +82,6 @@ def create_html(activity):
     elevation = round(activity["total_elevation_gain"], 1)
     time = round(activity["moving_time"] / 60, 1)
 
-    # HTML content with structure
     content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,6 +91,17 @@ def create_html(activity):
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+    <header>
+        <h1>Action Journal</h1>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../action-journal.html">Action Journal</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
     <div class="post-container">
         <h1>{title}</h1>
         <p><strong>Date:</strong> {date}</p>
@@ -108,6 +118,7 @@ def create_html(activity):
 """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
     return filename, content
+
 
 # --- Generate index.json ---
 def generate_index(posts_dir):
