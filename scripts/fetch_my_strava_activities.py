@@ -32,10 +32,6 @@ def refresh_access_token():
     response.raise_for_status()
     tokens = response.json()
 
-    # Debug: Print tokens
-    print("Access token loaded successfully!")
-
-
     # Save updated tokens to file
     with open(TOKEN_FILE, "w") as f:
         json.dump(tokens, f)
@@ -61,22 +57,8 @@ def fetch_my_activities():
     params = {"per_page": 30}
     
     response = requests.get(url, headers=headers, params=params)
-    print("API Response Status Code:", response.status_code)
-    
-    if response.status_code == 401:
-        print("Error: Unauthorized. Check access token permissions.")
-        raise Exception("401 Unauthorized - Check access token or scope permissions.")
-    
     response.raise_for_status()
-    activities = response.json()
-
-    if not activities:
-        print("No activities returned by the API.")
-        return []
-
-    return activities
-
-
+    return response.json()
 
 def filter_roller_ski(activities):
     filtered = []
@@ -119,7 +101,21 @@ tags: roller ski, san diego
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
     return filename, content
 
-  
+# --- Generate index.json ---
+def generate_index(posts_dir):
+    posts = []
+    for filename in os.listdir(posts_dir):
+        if filename.endswith(".md"):
+            date = '-'.join(filename.split('-')[:3])  # Extract YYYY-MM-DD
+            title = filename.replace('.md', '').replace('-', ' ').title()  # Clean title
+            posts.append({
+                "title": title,
+                "date": date,
+                "filename": filename
+            })
+    posts.sort(key=lambda x: x["date"], reverse=True)
+    with open(os.path.join(posts_dir, "index.json"), "w") as f:
+        json.dump(posts, f, indent=4)
 
 # --- Push to GitHub ---
 def push_to_github(files):
@@ -145,7 +141,6 @@ def push_to_github(files):
         except Exception as e:
             print(f"Error creating/updating {filepath}: {e}")
 
-
 # --- Main ---
 if __name__ == "__main__":
     os.makedirs(POSTS_DIR, exist_ok=True)
@@ -161,5 +156,6 @@ if __name__ == "__main__":
 
     if files_to_push:
         push_to_github(files_to_push)
+        generate_index(POSTS_DIR)  # Regenerate index.json after pushing
     else:
         print("No new Roller Ski activities found.")
