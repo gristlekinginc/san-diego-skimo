@@ -1,0 +1,94 @@
+import os
+import requests
+import datetime
+from github import Github
+
+# --- Configuration ---
+STRAVA_ACCESS_TOKEN = os.getenv("STRAVA_ACCESS_TOKEN")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+REPO_NAME = "your-username/san-diego-skimo"  # Replace with your repo name
+POSTS_DIR = "posts"  # Directory for blog posts
+
+# San Diego County Bounding Box
+SAN_DIEGO_BOUNDS = {
+    "sw_lat": 32.5343,  # Southwest latitude
+    "sw_lng": -117.1219,  # Southwest longitude
+    "ne_lat": 33.1145,  # Northeast latitude
+    "ne_lng": -116.0856,  # Northeast longitude
+}
+
+# --- Strava API ---
+def fetch_my_activities():
+    url = "https://www.strava.com/api/v3/athlete/activities"
+    headers = {"Authorization": f"Bearer {STRAVA_ACCESS_TOKEN}"}
+    params = {"per_page": 30}  # Fetch up to 30 activities
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+def filter_roller_ski(activities):
+    filtered = []
+    for activity in activities:
+        if activity["type"] == "RollerSki":
+            latlng = activity.get("start_latlng", [])
+            if latlng and (
+                SAN_DIEGO_BOUNDS["sw_lat"] <= latlng[0] <= SAN_DIEGO_BOUNDS["ne_lat"]
+                and SAN_DIEGO_BOUNDS["sw_lng"] <= latlng[1] <= SAN_DIEGO_BOUNDS["ne_lng"]
+            ):
+                filtered.append(activity)
+    return filtered
+
+# --- Create Markdown Post ---
+def create_markdown(activity):
+    date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
+    title = activity["name"]
+    distance = round(activity["distance"] / 1609, 2)  # meters to miles
+    elevation = round(activity["total_elevation_gain"], 1)
+    time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
+
+    content = f"""---
+title: "{title}"
+date: {date}
+tags: roller ski, san diego
+---
+
+### Stats
+- **Distance**: {distance} miles
+- **Elevation Gain**: {elevation} ft
+- **Time**: {time} minutes
+
+### Map
+[View Activity on Strava](https://www.strava.com/activities/{activity['id']})
+"""
+    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
+    return filename, content
+
+# --- Push to GitHub ---
+def push_to_github(files):
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
+
+    for filepath, content in files:
+        try:
+            repo.create_file(filepath, f"Add blog post for {filepath}", content)
+            print(f"Created: {filepath}")
+        except Exception as e:
+            print(f"Error creating {filepath}: {e}")
+
+# --- Main ---
+if __name__ == "__main__":
+    os.makedirs(POSTS_DIR, exist_ok=True)
+    activities = fetch_my_activities()
+    roller_ski_activities = filter_roller_ski(activities)
+
+    files_to_push = []
+    for activity in roller_ski_activities:
+        filename, content = create_markdown(activity)
+        with open(filename, "w") as f:
+            f.write(content)
+        files_to_push.append((filename, content))
+
+    if files_to_push:
+        push_to_github(files_to_push)
+    else:
+        print("No new Roller Ski activities found.")
