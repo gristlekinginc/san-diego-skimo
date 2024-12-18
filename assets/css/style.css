@@ -72,23 +72,24 @@ p {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    color: #00ff00; /* Green text */
-    background-color: transparent; /* Transparent background by default */
+    color: #ff00ff; /* Hot pink text */
+    background-color: transparent; /* Transparent background */
     text-decoration: none;
-    border: 2px solid #00ff00; /* Green border */
+    border: 2px solid #ff00ff; /* Hot pink border */
     border-radius: 5px;
-    transition: all 0.3s ease; /* Smooth animation */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
     text-align: center;
 }
 
 .cta-button:hover {
-    color: #000; /* Black text on hover */
-    background-color: transparent; /* No background even on hover */
-    border-color: #00ff00; /* Keep the green border */
-    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00; /* Glow effect on hover */
-    transform: scale(1.05); /* Slightly enlarge the button on hover */
-    cursor: pointer; /* Pointer cursor for interaction */
+    color: #00ff00; /* Green text */
+    background-color: transparent; /* Transparent background */
+    border-color: #00ff00; /* Green border */
+    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00; /* Green glow effect */
+    transform: scale(1.05); /* Slightly enlarge */
+    cursor: pointer; /* Pointer cursor */
 }
+
 
 
 /* Footer */
@@ -156,11 +157,4 @@ a:hover {
 
 .post a:hover {
     color: #00aa00;
-}
-
-/* Sharper Text for Buttons and General Elements */
-button, input, select, textarea {
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
 }
