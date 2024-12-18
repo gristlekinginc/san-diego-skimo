@@ -33,8 +33,9 @@ def refresh_access_token():
     tokens = response.json()
 
     # Debug: Print tokens
-    print("New Access Token:", tokens["access_token"])
-    print("Updated Refresh Token:", tokens["refresh_token"])
+    print("Access token refreshed successfully!")
+    print("Access token loaded successfully!")
+
 
     # Save updated tokens to file
     with open(TOKEN_FILE, "w") as f:
@@ -48,7 +49,6 @@ def load_access_token():
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, "r") as f:
             tokens = json.load(f)
-        print("Loaded Access Token:", tokens["access_token"])
         return tokens["access_token"]
     return refresh_access_token()
 
@@ -58,7 +58,6 @@ ACCESS_TOKEN = load_access_token()
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
-    print("Using Access Token:", ACCESS_TOKEN)
     headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
     params = {"per_page": 30}
     
