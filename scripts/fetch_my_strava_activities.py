@@ -106,16 +106,25 @@ def generate_index(posts_dir):
     posts = []
     for filename in os.listdir(posts_dir):
         if filename.endswith(".md"):
-            date = '-'.join(filename.split('-')[:3])  # Extract YYYY-MM-DD
-            title = filename.replace('.md', '').replace('-', ' ').title()  # Clean title
+            # Extract the date and title from filename
+            parts = filename.replace('.md', '').split('-')
+            date = '-'.join(parts[:3])  # Extract YYYY-MM-DD
+            title = ' '.join(parts[3:]).capitalize()
+            
             posts.append({
                 "title": title,
                 "date": date,
                 "filename": filename
             })
+
+    # Sort posts by date (latest first)
     posts.sort(key=lambda x: x["date"], reverse=True)
+
+    # Save the sorted posts to index.json
     with open(os.path.join(posts_dir, "index.json"), "w") as f:
         json.dump(posts, f, indent=4)
+    print("Generated index.json successfully!")
+
 
 # --- Push to GitHub ---
 def push_to_github(files):
@@ -133,13 +142,14 @@ def push_to_github(files):
                 pass  # File does not exist
             
             if existing_file:
-                repo.update_file(filepath, f"Update blog post for {filepath}", content, existing_file.sha)
+                repo.update_file(filepath, f"Update file: {filepath}", content, existing_file.sha)
                 print(f"Updated: {filepath}")
             else:
-                repo.create_file(filepath, f"Add blog post for {filepath}", content)
+                repo.create_file(filepath, f"Add file: {filepath}", content)
                 print(f"Created: {filepath}")
         except Exception as e:
             print(f"Error creating/updating {filepath}: {e}")
+
 
 # --- Main ---
 if __name__ == "__main__":
@@ -154,8 +164,14 @@ if __name__ == "__main__":
             f.write(content)
         files_to_push.append((filename, content))
 
+    # Generate index.json
+    generate_index(POSTS_DIR)
+    with open(f"{POSTS_DIR}/index.json", "r") as f:
+        files_to_push.append((f"{POSTS_DIR}/index.json", f.read()))
+
+    # Push all files to GitHub
     if files_to_push:
         push_to_github(files_to_push)
-        generate_index(POSTS_DIR)  # Regenerate index.json after pushing
     else:
         print("No new Roller Ski activities found.")
+
