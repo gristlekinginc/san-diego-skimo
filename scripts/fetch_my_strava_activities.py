@@ -58,11 +58,14 @@ ACCESS_TOKEN = load_access_token()
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
+    print("Using Access Token:", ACCESS_TOKEN)  # Debug print
     headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
     params = {"per_page": 30}
     response = requests.get(url, headers=headers, params=params)
+    print("API Response Status Code:", response.status_code)  # Debug status
     response.raise_for_status()
     return response.json()
+
 
 def filter_roller_ski(activities):
     filtered = []
