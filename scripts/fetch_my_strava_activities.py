@@ -20,11 +20,12 @@ SAN_DIEGO_BOUNDS = {
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
-    headers = {"Authorization": f"Bearer {STRAVA_ACCESS_TOKEN}"}
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}  # Use refreshed token
     params = {"per_page": 30}  # Fetch up to 30 activities
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
+
 
 def filter_roller_ski(activities):
     filtered = []
