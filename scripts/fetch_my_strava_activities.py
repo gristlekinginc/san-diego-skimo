@@ -101,6 +101,7 @@ def create_markdown(activity):
     content = f"""---
 title: "{title}"
 date: {date}
+description = activity.get("description", "No description provided")
 tags: roller ski, san diego
 ---
 
