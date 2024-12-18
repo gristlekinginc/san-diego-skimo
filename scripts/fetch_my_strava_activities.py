@@ -2,9 +2,8 @@ import os
 import requests
 import datetime
 import json
+import markdown  # Import the markdown library to convert Markdown to HTML
 from github import Github
-
-
 
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
@@ -74,59 +73,72 @@ def filter_roller_ski(activities):
                 filtered.append(activity)
     return filtered
 
-# --- Create Markdown Post ---
-def create_markdown(activity):
+# --- Create HTML Post ---
+def create_html(activity):
     date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
     title = activity["name"]
-    description = activity.get("description", "No description provided")  # Extract the description
+    description = activity.get("description", "No description provided")
     distance = round(activity["distance"] / 1609, 2)  # meters to miles
     elevation = round(activity["total_elevation_gain"], 1)
     time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
 
-    content = f"""---
-title: "{title}"
-date: {date}
-tags: roller ski, san diego
----
+    markdown_content = f"""# {title}
+**Date**: {date}
 
-### Stats
+## Stats
 - **Distance**: {distance} miles
 - **Elevation Gain**: {elevation} ft
 - **Time**: {time} minutes
 
-### Description
+## Description
 {description}
 
-### Map
+## Map
 [View Activity on Strava](https://www.strava.com/activities/{activity['id']})
 """
-    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
-    return filename, content
+
+    # Convert Markdown to HTML
+    html_content = markdown.markdown(markdown_content)
+
+    # Wrap HTML in a template for styling
+    full_html = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{title}</title>
+        <link rel="stylesheet" href="../assets/css/style.css">
+    </head>
+    <body>
+        <div class="post">
+            {html_content}
+        </div>
+    </body>
+    </html>
+    """
+    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
+    return filename, full_html
 
 # --- Generate index.json ---
 def generate_index(posts_dir):
     posts = []
     for filename in os.listdir(posts_dir):
-        if filename.endswith(".md"):
-            # Extract the date and title from filename
-            parts = filename.replace('.md', '').split('-')
+        if filename.endswith(".html"):
+            parts = filename.replace('.html', '').split('-')
             date = '-'.join(parts[:3])  # Extract YYYY-MM-DD
             title = ' '.join(parts[3:]).capitalize()
-            
             posts.append({
                 "title": title,
                 "date": date,
                 "filename": filename
             })
 
-    # Sort posts by date (latest first)
     posts.sort(key=lambda x: x["date"], reverse=True)
 
-    # Save the sorted posts to index.json
     with open(os.path.join(posts_dir, "index.json"), "w") as f:
         json.dump(posts, f, indent=4)
     print("Generated index.json successfully!")
-
 
 # --- Push to GitHub ---
 def push_to_github(files):
@@ -138,10 +150,9 @@ def push_to_github(files):
         try:
             existing_file = None
             try:
-                # Check if the file already exists
                 existing_file = repo.get_contents(filepath)
             except Exception:
-                pass  # File does not exist
+                pass
             
             if existing_file:
                 repo.update_file(filepath, f"Update file: {filepath}", content, existing_file.sha)
@@ -152,7 +163,6 @@ def push_to_github(files):
         except Exception as e:
             print(f"Error creating/updating {filepath}: {e}")
 
-
 # --- Main ---
 if __name__ == "__main__":
     os.makedirs(POSTS_DIR, exist_ok=True)
@@ -161,19 +171,16 @@ if __name__ == "__main__":
 
     files_to_push = []
     for activity in roller_ski_activities:
-        filename, content = create_markdown(activity)
+        filename, content = create_html(activity)
         with open(filename, "w") as f:
             f.write(content)
         files_to_push.append((filename, content))
 
-    # Generate index.json
     generate_index(POSTS_DIR)
     with open(f"{POSTS_DIR}/index.json", "r") as f:
         files_to_push.append((f"{POSTS_DIR}/index.json", f.read()))
 
-    # Push all files to GitHub
     if files_to_push:
         push_to_github(files_to_push)
     else:
         print("No new Roller Ski activities found.")
-
