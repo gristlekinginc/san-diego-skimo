@@ -1,4 +1,4 @@
-/* Atari-like Retro Style */
+/* Atari Retro Style */
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 body {
@@ -47,16 +47,19 @@ main {
     max-width: 800px;
 }
 
+/* Headings */
 h1, h2, h3 {
     color: #00ff00;
     text-shadow: 0 0 5px #00ff00;
     margin-bottom: 20px;
 }
 
+/* Paragraphs */
 p {
     font-size: 1.2em;
 }
 
+/* Buttons */
 .cta-button {
     display: inline-block;
     margin-top: 20px;
@@ -76,6 +79,7 @@ p {
     border-color: #00aa00;
 }
 
+/* Footer */
 footer {
     background-color: #000;
     color: #00ff00;
@@ -91,5 +95,53 @@ a {
 }
 
 a:hover {
+    color: #00aa00;
+}
+
+/* Posts Style */
+.post-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #111; /* Slightly lighter black for contrast */
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+.post {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #000;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.post h2 {
+    color: #00ff00;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+    text-shadow: 0 0 3px #00ff00;
+}
+
+.post pre {
+    background-color: #111;
+    color: #00ff00;
+    padding: 15px;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+}
+
+.post a {
+    color: #00ff00;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.post a:hover {
     color: #00aa00;
 }
