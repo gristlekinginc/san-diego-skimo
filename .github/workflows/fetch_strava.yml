@@ -21,69 +21,10 @@ jobs:
     - name: Install Dependencies
       run: pip install requests PyGithub
 
-    - name: Fetch Activities and Push to GitHub
+    - name: Fetch and Push Activities
       env:
-        STRAVA_ACCESS_TOKEN: ${{ secrets.STRAVA_ACCESS_TOKEN }}
+        STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+        STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+        STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        import os
-        import requests
-        import datetime
-        from github import Github
-
-        # Configuration
-        STRAVA_ACCESS_TOKEN = os.getenv("STRAVA_ACCESS_TOKEN")
-        GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-        REPO_NAME = "your-username/san-diego-skimo"
-        POSTS_DIR = "posts"
-        SAN_DIEGO_BOUNDS = {"sw_lat": 32.5343, "sw_lng": -117.1219, "ne_lat": 33.1145, "ne_lng": -116.0856}
-
-        # Fetch activities
-        def fetch_activities():
-            headers = {"Authorization": f"Bearer {STRAVA_ACCESS_TOKEN}"}
-            response = requests.get("https://www.strava.com/api/v3/athlete/activities", headers=headers, params={"per_page": 20})
-            response.raise_for_status()
-            return response.json()
-
-        # Filter for Roller Ski activities in San Diego
-        def filter_activities(activities):
-            return [
-                a for a in activities
-                if a["type"] == "RollerSki" and a["start_latlng"]
-                and SAN_DIEGO_BOUNDS["sw_lat"] <= a["start_latlng"][0] <= SAN_DIEGO_BOUNDS["ne_lat"]
-                and SAN_DIEGO_BOUNDS["sw_lng"] <= a["start_latlng"][1] <= SAN_DIEGO_BOUNDS["ne_lng"]
-            ]
-
-        # Create Markdown content
-        def create_post(activity):
-            date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
-            title = activity["name"]
-            distance = round(activity["distance"] / 1609, 2)
-            elevation = round(activity["total_elevation_gain"], 1)
-            return f"posts/{date}-{title.replace(' ', '-').lower()}.md", f\"""---
-title: "{title}"
-date: {date}
-tags: roller ski, san diego
----
-
-### Stats
-- **Distance**: {distance} miles
-- **Elevation Gain**: {elevation} ft
-- [View on Strava](https://www.strava.com/activities/{activity['id']})
-\""""
-
-        # Push posts to GitHub
-        g = Github(GITHUB_TOKEN)
-        repo = g.get_repo(REPO_NAME)
-
-        os.makedirs(POSTS_DIR, exist_ok=True)
-        activities = fetch_activities()
-        roller_ski_activities = filter_activities(activities)
-
-        for activity in roller_ski_activities:
-            filepath, content = create_post(activity)
-            try:
-                repo.create_file(filepath, f"Add post for {filepath}", content)
-                print(f"Created post: {filepath}")
-            except Exception as e:
-                print(f"File already exists or error: {e}")
+      run: python scripts/fetch_my_strava_activities.py
