@@ -27,6 +27,8 @@ def refresh_access_token():
         "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
         "grant_type": "refresh_token",
         "refresh_token": os.getenv("STRAVA_REFRESH_TOKEN"),
+        print("New Access Token:", tokens["access_token"])
+
     }
 
     response = requests.post(url, data=payload)
@@ -47,6 +49,8 @@ def load_access_token():
             tokens = json.load(f)
         return tokens["access_token"]
     return refresh_access_token()
+    print("Loaded Access Token:", tokens["access_token"])
+
 
 # Assign the ACCESS_TOKEN here
 ACCESS_TOKEN = load_access_token()
