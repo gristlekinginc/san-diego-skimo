@@ -33,7 +33,6 @@ def refresh_access_token():
     tokens = response.json()
 
     # Debug: Print tokens
-    print("Access token refreshed successfully!")
     print("Access token loaded successfully!")
 
 
