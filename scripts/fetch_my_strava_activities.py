@@ -103,6 +103,7 @@ tags: roller ski, san diego
 """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
     return filename, content
+  
 
 # --- Push to GitHub ---
 def push_to_github(files):
