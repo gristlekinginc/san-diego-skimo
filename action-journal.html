@@ -8,38 +8,69 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <h1>Action Journal</h1>
-    <div class="post-container" id="post-container"></div>
+    <!-- Header Section -->
+    <header>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="action-journal.html">Action Journal</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
+    <!-- Main Content -->
+    <main>
+        <h1>Action Journal</h1>
+        <div class="post-container" id="post-container">
+            <!-- Posts will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 San Diego Skimo. All rights reserved.</p>
+    </footer>
+
+    <!-- Script for Loading Posts -->
     <script>
         async function loadPosts() {
             const container = document.getElementById("post-container");
-            
-            // Simulated list of files from the `posts` directory
+
+            // Simulated list of posts from the 'posts' directory
             const posts = [
                 "2024-12-18-roller-ski-the-15-incline-to-adams.md",
                 "2024-12-06-a-tentative-foray-into-ski-hill-training.md",
                 "2024-08-16-ski-to-work-day.md"
             ];
 
-            // Sort the posts chronologically: latest first
+            // Sort posts by date (latest first)
             posts.sort((a, b) => new Date(b.split('-').slice(0, 3).join('-')) - new Date(a.split('-').slice(0, 3).join('-')));
 
             // Fetch and render each post
             for (const post of posts) {
-                const response = await fetch(`posts/${post}`);
-                if (response.ok) {
-                    const content = await response.text();
-                    const title = post.replace(/-/g, ' ').replace('.md', '').split('.md')[0];
-                    const postHTML = `
-                        <div class="post">
-                            <h2>${title}</h2>
-                            <pre>${content}</pre>
-                        </div>
-                    `;
-                    container.innerHTML += postHTML;
-                } else {
-                    console.error(`Error loading post: ${post}`);
+                try {
+                    const response = await fetch(`posts/${post}`);
+                    if (response.ok) {
+                        const content = await response.text();
+
+                        // Extract title and content
+                        const lines = content.split('\n');
+                        const titleLine = lines.find(line => line.startsWith('title:'));
+                        const title = titleLine ? titleLine.replace('title: ', '').replace(/"/g, '') : "Untitled Post";
+
+                        const postHTML = `
+                            <div class="post">
+                                <h2>${title}</h2>
+                                <pre>${lines.slice(5).join('\n')}</pre>
+                            </div>
+                        `;
+                        container.innerHTML += postHTML;
+                    } else {
+                        console.error(`Error loading post: ${post}`);
+                    }
+                } catch (error) {
+                    console.error(`Failed to load post ${post}:`, error);
                 }
             }
         }
