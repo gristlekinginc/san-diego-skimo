@@ -2,6 +2,7 @@ import os
 import requests
 import datetime
 from github import Github
+import json
 
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
