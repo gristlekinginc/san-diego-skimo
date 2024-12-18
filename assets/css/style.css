@@ -73,18 +73,20 @@ p {
     padding: 5px 10px;
     font-size: 1.2em;
     color: #00ff00;
-    background-color: transparent;
+    background-color: transparent; /* Always transparent background */
     text-decoration: none;
-    border: 2px solid #00ff00;
+    border: 2px solid #00ff00; /* Green border */
     border-radius: 10px;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    text-align: center;
 }
 
 .cta-button:hover {
-    color: #000;
-    background-color: #00ff00;
-    border-color: #00ff00;
-    box-shadow: 0 0 8px #00ff00;
+    color: #00ff00; /* Keep the green text */
+    border-width: 3px; /* Slightly thicken the border */
+    box-shadow: 0 0 12px #00ff00, 0 0 20px #00ff00; /* Stronger glow effect */
+    transform: scale(1.05); /* Slightly enlarge the button */
+    cursor: pointer; /* Change cursor to pointer */
 }
 
 
