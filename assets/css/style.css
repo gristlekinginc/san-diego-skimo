@@ -1,51 +1,95 @@
+/* Atari-like Retro Style */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'VT323', monospace; /* Retro pixel-style font */
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #000; /* Black background */
+    color: #00ff00; /* Green text */
+    line-height: 1.6;
+    text-align: center;
 }
+
 header {
-    background-color: #333;
-    color: white;
+    background-color: #000;
+    border-bottom: 2px solid #00ff00;
     padding: 10px 0;
     text-align: center;
 }
-.nav-list {
+
+header .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
-    list-style: none;
-    padding: 0;
-    margin: 0;
 }
-.nav-list li {
-    margin: 0 15px;
+
+header .nav-list li {
+    margin: 0 20px;
 }
-.nav-list a {
-    color: white;
+
+header .nav-list a {
+    color: #00ff00;
     text-decoration: none;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+header .nav-list a:hover {
+    color: #00aa00; /* Slightly darker green for hover */
+}
+
+main {
+    margin: 40px auto;
+    max-width: 800px;
+}
+
+h1, h2, h3 {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    margin-bottom: 20px;
+}
+
+p {
     font-size: 1.2em;
 }
-.nav-list a:hover {
-    text-decoration: underline;
-}
-footer {
-    text-align: center;
-    padding: 20px 0;
-    background-color: #333;
-    color: white;
-    font-size: 0.9em;
-}
+
 .cta-button {
     display: inline-block;
-    background-color: #007acc;
-    color: white;
-    text-decoration: none;
+    margin-top: 20px;
     padding: 10px 20px;
+    font-size: 1.2em;
+    color: #000;
+    background-color: #00ff00;
+    text-decoration: none;
+    border: 2px solid #00ff00;
     border-radius: 5px;
-    margin-top: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 .cta-button:hover {
-    background-color: #005f99;
+    background-color: #000;
+    color: #00ff00;
+    border-color: #00aa00;
+}
+
+footer {
+    background-color: #000;
+    color: #00ff00;
+    padding: 10px 0;
+    border-top: 2px solid #00ff00;
+    font-size: 1em;
+    margin-top: 20px;
+}
+
+a {
+    color: #00ff00;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #00aa00;
 }
