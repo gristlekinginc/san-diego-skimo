@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
-  contents: write  # Add this line
+  contents: write  # Allow write access to repository contents
 
 jobs:
   fetch-and-push:
@@ -16,7 +16,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Fetch entire history to allow proper pulls and merges
+        fetch-depth: 0  # Fetch full history to allow pulls and merges
 
     - name: Set Up Python
       uses: actions/setup-python@v3
@@ -26,8 +26,27 @@ jobs:
     - name: Install Dependencies
       run: pip install requests PyGithub markdown
 
-    - name: Fetch and Push Activities
+    - name: Fetch and Update Activities
       env:
         STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
         STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-        STRA
+        STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        
+        # Pull the latest changes to avoid conflicts
+        git pull --rebase origin main
+
+        # Run your Python script to generate files
+        python scripts/fetch_my_strava_activities.py
+
+        # Stage and commit new or updated files
+        git add posts/*.html posts/index.json
+        git commit -m "Update Strava posts with latest HTML and index" || echo "No changes to commit"
+
+    - name: Push Changes
+      run: |
+        # Push changes to the repository, forcing if necessary
+        git push origin main || git push origin main --force
