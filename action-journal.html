@@ -1,30 +1,50 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Journal - San Diego Skimo</title>
+    <title>Action Journal</title>
+    <!-- Link to your external CSS file -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul class="nav-list">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="action-journal.html">Action Journal</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="faq.html">FAQ</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h1>Action Journal</h1>
-        <p>Check out the latest training sessions and adventures from our skimo community!</p>
-    </main>
-    <footer>
-        <p>&copy; 2024 San Diego Skimo Community</p>
-    </footer>
+    <h1>Action Journal</h1>
+    <div class="post-container" id="post-container"></div>
+
+    <script>
+        async function loadPosts() {
+            const container = document.getElementById("post-container");
+            
+            // Simulated list of files from the `posts` directory
+            const posts = [
+                "2024-12-18-roller-ski-the-15-incline-to-adams.md",
+                "2024-12-06-a-tentative-foray-into-ski-hill-training.md",
+                "2024-08-16-ski-to-work-day.md"
+            ];
+
+            // Sort the posts chronologically: latest first
+            posts.sort((a, b) => new Date(b.split('-').slice(0, 3).join('-')) - new Date(a.split('-').slice(0, 3).join('-')));
+
+            // Fetch and render each post
+            for (const post of posts) {
+                const response = await fetch(`posts/${post}`);
+                if (response.ok) {
+                    const content = await response.text();
+                    const title = post.replace(/-/g, ' ').replace('.md', '').split('.md')[0];
+                    const postHTML = `
+                        <div class="post">
+                            <h2>${title}</h2>
+                            <pre>${content}</pre>
+                        </div>
+                    `;
+                    container.innerHTML += postHTML;
+                } else {
+                    console.error(`Error loading post: ${post}`);
+                }
+            }
+        }
+
+        loadPosts();
+    </script>
 </body>
 </html>
