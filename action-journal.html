@@ -28,58 +28,32 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-        async function loadPosts() {
-            const container = document.getElementById("post-container");
+   <script>
+    async function loadPosts() {
+        const container = document.getElementById("post-container");
 
-            const response = await fetch("posts/index.json");
-            const posts = await response.json();
+        // Fetch index.json to get the list of posts
+        const response = await fetch("posts/index.json");
+        const posts = await response.json();
 
-            posts.slice(0, 5).forEach(post => { // Display 5 posts per page
-                fetch(`posts/${post.filename}`)
-                    .then(res => res.text())
-                    .then(markdown => {
-                        const metadata = extractPostMetadata(markdown);
-                        const postHTML = `
-                            <div class="post">
-                                <h3>${metadata.title}</h3>
-                                <p><strong>Date:</strong> ${metadata.date}</p>
-                                <p><strong>Distance:</strong> ${metadata.distance}</p>
-                                <p><strong>Elevation Gain:</strong> ${metadata.elevation}</p>
-                                <p><strong>Time:</strong> ${metadata.time}</p>
-                                <a href="posts/${post.filename}" class="cta-button">Read more</a>
-                            </div>
-                        `;
-                        container.insertAdjacentHTML('beforeend', postHTML);
-                    });
-            });
-        }
+        // Display the latest 5 posts
+        posts.slice(0, 5).forEach(post => {
+            const postHTML = `
+                <div class="post">
+                    <h2>${post.title}</h2>
+                    <p><strong>Date:</strong> ${post.date}</p>
+                    <p><strong>Distance:</strong> ${post.distance || "N/A"}</p>
+                    <p><strong>Elevation Gain:</strong> ${post.elevation || "N/A"}</p>
+                    <p><strong>Time:</strong> ${post.time || "N/A"}</p>
+                    <a href="posts/${post.filename}" class="cta-button">Read more</a>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', postHTML);
+        });
+    }
 
-        function extractPostMetadata(markdown) {
-            const metadata = {
-                title: "Unknown Title",
-                date: "Unknown Date",
-                distance: "N/A",
-                elevation: "N/A",
-                time: "N/A"
-            };
+    loadPosts();
+</script>
 
-            const titleMatch = markdown.match(/title: "(.*?)"/);
-            const dateMatch = markdown.match(/date: (.*?)\n/);
-            const distanceMatch = markdown.match(/Distance\*\*: (.*?) miles/);
-            const elevationMatch = markdown.match(/Elevation Gain\*\*: (.*?) ft/);
-            const timeMatch = markdown.match(/Time\*\*: (.*?) minutes/);
-
-            if (titleMatch) metadata.title = titleMatch[1];
-            if (dateMatch) metadata.date = dateMatch[1];
-            if (distanceMatch) metadata.distance = distanceMatch[1] + " miles";
-            if (elevationMatch) metadata.elevation = elevationMatch[1] + " ft";
-            if (timeMatch) metadata.time = timeMatch[1] + " minutes";
-
-            return metadata;
-        }
-
-        loadPosts();
-    </script>
 </body>
 </html>
