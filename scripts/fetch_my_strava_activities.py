@@ -1,22 +1,21 @@
 import os
 import requests
 import datetime
-from github import Github
 import json
+from github import Github
 
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
-STRAVA_ACCESS_TOKEN = os.getenv("STRAVA_ACCESS_TOKEN")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_NAME = "your-username/san-diego-skimo"  # Replace with your repo name
 POSTS_DIR = "posts"  # Directory for blog posts
 
 # San Diego County Bounding Box
 SAN_DIEGO_BOUNDS = {
-    "sw_lat": 32.5343,  # Southwest latitude
-    "sw_lng": -117.1219,  # Southwest longitude
-    "ne_lat": 33.1145,  # Northeast latitude
-    "ne_lng": -116.0856,  # Northeast longitude
+    "sw_lat": 32.5343,
+    "sw_lng": -117.1219,
+    "ne_lat": 33.1145,
+    "ne_lng": -116.0856,
 }
 
 # --- Refresh Access Token ---
@@ -27,13 +26,15 @@ def refresh_access_token():
         "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
         "grant_type": "refresh_token",
         "refresh_token": os.getenv("STRAVA_REFRESH_TOKEN"),
-        print("New Access Token:", tokens["access_token"])
-
     }
 
     response = requests.post(url, data=payload)
     response.raise_for_status()
     tokens = response.json()
+
+    # Debug: Print tokens
+    print("New Access Token:", tokens["access_token"])
+    print("Updated Refresh Token:", tokens["refresh_token"])
 
     # Save updated tokens to file
     with open(TOKEN_FILE, "w") as f:
@@ -47,10 +48,9 @@ def load_access_token():
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, "r") as f:
             tokens = json.load(f)
+        print("Loaded Access Token:", tokens["access_token"])
         return tokens["access_token"]
     return refresh_access_token()
-    print("Loaded Access Token:", tokens["access_token"])
-
 
 # Assign the ACCESS_TOKEN here
 ACCESS_TOKEN = load_access_token()
@@ -58,13 +58,11 @@ ACCESS_TOKEN = load_access_token()
 # --- Strava API ---
 def fetch_my_activities():
     url = "https://www.strava.com/api/v3/athlete/activities"
-    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}  # Use refreshed token
-    params = {"per_page": 30}  # Fetch up to 30 activities
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
+    params = {"per_page": 30}
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
-
-
 
 def filter_roller_ski(activities):
     filtered = []
