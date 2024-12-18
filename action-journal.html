@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Action Journal</title>
-    <!-- Link to your external CSS file -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <!-- Navigation -->
     <header>
         <h1>Action Journal</h1>
         <nav>
@@ -19,10 +19,18 @@
         </nav>
     </header>
 
+    <!-- Main Content -->
     <main>
+        <h2>Here are the latest workouts recorded in uphill skiing mecca San Diego</h2>
         <div class="post-container" id="post-container"></div>
+        <div class="pagination" id="pagination">
+            <button id="prev" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button id="next">Next</button>
+        </div>
     </main>
 
+    <!-- Footer -->
     <footer>
         <p>&copy; 2024 San Diego Skimo Community</p>
     </footer>
@@ -30,41 +38,73 @@
     <!-- Include the marked.js library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        async function loadPosts() {
-            const container = document.getElementById("post-container");
+        const POSTS_PER_PAGE = 5;
+        let currentPage = 1;
+        let posts = [];
 
-            // Simulated list of posts
-            const posts = [
-                "2024-12-18-roller-ski-the-15-incline-to-adams.md",
-                "2024-12-06-a-tentative-foray-into-ski-hill-training.md",
-                "2024-08-16-ski-to-work-day.md"
-            ];
-
-            // Sort posts by date: latest first
-            posts.sort((a, b) => new Date(b.split('-').slice(0, 3).join('-')) - new Date(a.split('-').slice(0, 3).join('-')));
-
-            // Clear container before loading
-            container.innerHTML = "";
-
-            for (const post of posts) {
-                const response = await fetch(`posts/${post}`);
-                if (response.ok) {
-                    const markdown = await response.text();
-                    const htmlContent = marked.parse(markdown); // Convert Markdown to HTML
-                    
-                    const postHTML = `
-                        <div class="post">
-                            ${htmlContent}
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', postHTML);
-                } else {
-                    console.error(`Error loading post: ${post}`);
-                }
+        async function fetchPostList() {
+            try {
+                const response = await fetch("posts/index.json"); // JSON file containing the list of posts
+                if (!response.ok) throw new Error("Failed to fetch post list");
+                posts = await response.json();
+                posts.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, newest first
+                renderPosts();
+            } catch (error) {
+                console.error("Error fetching posts:", error);
             }
         }
 
-        loadPosts();
+        async function renderPosts() {
+            const container = document.getElementById("post-container");
+            const paginationInfo = document.getElementById("page-info");
+            const start = (currentPage - 1) * POSTS_PER_PAGE;
+            const end = start + POSTS_PER_PAGE;
+
+            // Paginate posts
+            const paginatedPosts = posts.slice(start, end);
+
+            container.innerHTML = ""; // Clear existing content
+            for (const post of paginatedPosts) {
+                const response = await fetch(`posts/${post.filename}`);
+                if (response.ok) {
+                    let markdown = await response.text();
+                    markdown = markdown.replace(/---[\s\S]*?---/, ""); // Remove front matter
+                    const htmlContent = marked.parse(markdown);
+
+                    // Create post box
+                    const postHTML = `
+                        <div class="post">
+                            <h2>${post.title}</h2>
+                            ${htmlContent}
+                        </div>
+                    `;
+                    container.insertAdjacentHTML("beforeend", postHTML);
+                }
+            }
+
+            // Update pagination
+            paginationInfo.textContent = `Page ${currentPage} of ${Math.ceil(posts.length / POSTS_PER_PAGE)}`;
+            document.getElementById("prev").disabled = currentPage === 1;
+            document.getElementById("next").disabled = end >= posts.length;
+        }
+
+        // Pagination controls
+        document.getElementById("prev").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPosts();
+            }
+        });
+
+        document.getElementById("next").addEventListener("click", () => {
+            if (currentPage * POSTS_PER_PAGE < posts.length) {
+                currentPage++;
+                renderPosts();
+            }
+        });
+
+        // Initialize
+        fetchPostList();
     </script>
 </body>
 </html>
