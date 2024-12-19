@@ -10,6 +10,9 @@ _site/
 # Access Token refresh
 scripts/strava_tokens.json
 
+# Env file
+.env
+
 # Additional Ruby/bundler ignore for when you run: bundle install
 /vendor
 
