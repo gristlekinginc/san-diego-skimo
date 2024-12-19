@@ -24,15 +24,48 @@
     <main>
         <h1>Contact Us</h1>
         <p>Have a question or want to join? Reach out to us using the form below or on Strava!</p>
-        <form action="https://formspree.io/f/your-form-id" method="POST">
-            <label for="name">Name:</label><br>
-            <input type="text" id="name" name="name" required><br><br>
-            <label for="email">Email:</label><br>
-            <input type="email" id="email" name="email" required><br><br>
-            <label for="message">Message:</label><br>
-            <textarea id="message" name="message" rows="5" required></textarea><br><br>
-            <button type="submit">Send Message</button>
-        </form>
+        <form id="contact-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" required></textarea>
+
+    <!-- Honeypot field to detect bots -->
+    <input type="text" name="hiddenField" style="display:none;" tabindex="-1">
+
+    <button type="submit">Send</button>
+</form>
+
+<p id="response-message"></p>
+
+<script>
+    document.getElementById("contact-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        const response = await fetch("https://your-cloudflare-worker-url.com", {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const result = await response.json();
+        const messageEl = document.getElementById("response-message");
+
+        if (response.ok) {
+            messageEl.textContent = "Thank you! Your message has been sent.";
+            messageEl.style.color = "green";
+        } else {
+            messageEl.textContent = `Error: ${result.message || "Unable to send message"}`;
+            messageEl.style.color = "red";
+        }
+    });
+</script>
+
     </main>
     <footer>
         <p>&copy; 2024 San Diego Skimo Community</p>
