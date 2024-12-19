@@ -17,6 +17,12 @@ scripts/strava_tokens.json
 .DS_Store
 ._*
 
+# Virtual environment
+sdskimo-venv/
+
+# Python dependencies file
+requirements.txt
+
 
 # Additional Ruby/bundler ignore for when you run: bundle install
 /vendor
