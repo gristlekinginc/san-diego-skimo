@@ -66,13 +66,13 @@ p {
     font-size: 1.2em;
 }
 
-/* Buttons */
-.cta-button {
+/* Button Default State */
+.post .cta-button {
     display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    color: #ff00ff; /* Hot pink text for clarity */
+    color: #ff00ff; /* Hot pink text */
     background-color: transparent; /* Transparent background */
     text-decoration: none;
     border: 2px solid #ff00ff; /* Hot pink border */
@@ -80,7 +80,8 @@ p {
     transition: all 0.3s ease; /* Smooth transition */
 }
 
-.cta-button:hover {
+/* Button Hover State */
+.post .cta-button:hover {
     color: #00ff00; /* Green text on hover */
     background-color: transparent; /* Transparent background */
     border-color: #00ff00; /* Green border on hover */
@@ -88,6 +89,7 @@ p {
     transform: scale(1.05); /* Slightly enlarge */
     cursor: pointer; /* Pointer cursor */
 }
+
 
 /* Footer */
 footer {
