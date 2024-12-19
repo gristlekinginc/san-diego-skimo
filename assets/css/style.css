@@ -73,13 +73,12 @@ p {
     padding: 10px 20px;
     font-size: 1.2em;
     color: #ff00ff; /* Hot pink text */
-    background-color: transparent; /* Ensure it's transparent by default */
+    background-color: transparent; /* Fix: make the default background transparent */
     text-decoration: none;
     border: 2px solid #ff00ff; /* Hot pink border */
     border-radius: 5px;
     transition: all 0.3s ease; /* Smooth transition */
 }
-
 
 /* Button Hover State */
 .cta-button:hover {
