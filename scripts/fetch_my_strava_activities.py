@@ -75,13 +75,16 @@ def filter_roller_ski(activities):
 
 # --- Create HTML Post ---
 def create_html(activity):
+    # Parse activity details
     date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
     title = activity["name"]
-    description = activity.get("description", "No description provided")
-    distance = round(activity["distance"] / 1609, 2)  # meters to miles
-    elevation = round(activity["total_elevation_gain"], 1)
-    time = round(activity["moving_time"] / 60, 1)
+    description = activity.get("description", "No description provided").strip()
+    distance = round(activity["distance"] / 1609, 2)  # Convert meters to miles
+    elevation = round(activity.get("total_elevation_gain", 0), 1)  # Default to 0 if missing
+    time = round(activity["moving_time"] / 60, 1)  # Convert seconds to minutes
+    map_link = f"https://www.strava.com/activities/{activity['id']}"  # Generate activity link
 
+    # Generate HTML content
     content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,15 +113,16 @@ def create_html(activity):
         <p><strong>Elevation Gain:</strong> {elevation} ft</p>
         <p><strong>Time:</strong> {time} minutes</p>
         <h2>Description</h2>
-        <p>{description}</p>
+        <p>{description if description else "No description provided"}</p>
         <h2>Map</h2>
-        <p><a href="https://www.strava.com/activities/{activity['id']}" target="_blank">View Activity on Strava</a></p>
+        <p><a href="{map_link}" target="_blank">View Activity on Strava</a></p>
     </div>
 </body>
 </html>
 """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
     return filename, content
+
 
 
 
