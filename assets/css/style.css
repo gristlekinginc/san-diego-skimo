@@ -36,7 +36,7 @@ header .nav-list li {
 }
 
 header .nav-list a {
-    color: #00ff00;
+    color: #00ff00; /* Green for nav links */
     text-decoration: none;
     font-size: 1.5em;
     text-transform: uppercase;
@@ -86,17 +86,15 @@ p {
     transition: all 0.3s ease; /* Smooth transition */
 }
 
-/* Button Hover State */
 .cta-button:hover {
     color: #00ff00; /* Green text on hover */
-    background-color: transparent; /* Transparent background */
-    border-color: #00ff00; /* Green border on hover */
+    background-color: transparent;
+    border-color: #00ff00;
     box-shadow: 0 0 8px #00ff00; /* Green glow effect */
     transform: scale(1.05); /* Slightly enlarge */
     cursor: pointer; /* Pointer cursor */
 }
 
-/* Footer */
 footer {
     background-color: #000;
     color: #00ff00;
@@ -106,59 +104,36 @@ footer {
     margin-top: 20px;
 }
 
+/* General link styles */
 a {
-    color: #00ff00;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #00aa00;
-}
-
-/* Posts Container */
-.post-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: #111; /* Slightly lighter black for contrast */
-    border: 2px solid #00ff00;
-    border-radius: 5px;
-    box-shadow: 0 0 10px #00ff00;
-}
-
-.post {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #000;
-    border: 1px solid #00ff00;
-    border-radius: 4px;
-    text-align: left;
-}
-
-.post h2 {
-    color: #00ff00;
-    margin-bottom: 10px;
-    font-size: 1.8em;
-    text-shadow: 0 0 2px #00ff00; /* Reduce shadow for sharper text */
-}
-
-.post pre {
-    background-color: #111;
-    color: #00ff00;
-    padding: 15px;
-    border: 1px solid #00ff00;
-    border-radius: 4px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-x: auto;
-}
-
-.post a {
-    color: #00ff00;
+    color: #ff4500; /* Bright orange for contrast */
     text-decoration: underline;
+    font-weight: bold;
     transition: color 0.3s ease;
 }
 
-.post a:hover {
-    color: #00aa00;
+a:hover {
+    color: #ff6347; /* Slightly lighter orange on hover */
+}
+
+/* Navigation bar links - keep existing style */
+header .nav-list a {
+    color: #00ff00; /* Green for nav links */
+    text-decoration: none;
+    font-weight: normal;
+}
+
+header .nav-list a:hover {
+    color: #00aa00; /* Slightly darker green for hover */
+}
+
+/* Apply contrasting styles to non-nav links */
+body a:not(header .nav-list a) {
+    color: #ff4500; /* Bright orange */
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+body a:not(header .nav-list a):hover {
+    color: #ff6347; /* Slightly lighter orange on hover */
 }
