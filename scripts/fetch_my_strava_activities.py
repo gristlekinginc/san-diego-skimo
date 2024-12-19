@@ -3,7 +3,6 @@ import requests
 import datetime
 import json
 import markdown  # Import the markdown library to convert Markdown to HTML
-from github import Github
 
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
