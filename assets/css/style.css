@@ -8,7 +8,6 @@ body {
     background-color: #000; /* Black background */
     color: #00ff00; /* Green text */
     line-height: 1.6;
-    text-align: center;
 
     /* Improve text rendering */
     -webkit-font-smoothing: none;
@@ -20,7 +19,7 @@ header {
     background-color: #000;
     border-bottom: 2px solid #00ff00;
     padding: 10px 0;
-    text-align: center;
+    text-align: center; /* Keep header text centered */
 }
 
 header .nav-list {
@@ -36,7 +35,7 @@ header .nav-list li {
 }
 
 header .nav-list a {
-    color: #00ff00; /* Green for nav links */
+    color: #00ff00;
     text-decoration: none;
     font-size: 1.5em;
     text-transform: uppercase;
@@ -50,10 +49,9 @@ header .nav-list a:hover {
 main {
     margin: 40px auto;
     max-width: 800px;
-    text-align: left; /* Override center alignment */
+    text-align: left; /* Left-align main content */
 }
 
-/* Headings - Sharper Text */
 h1, h2, h3 {
     color: #00ff00;
     text-shadow: 0 0 2px #00ff00; /* Reduce blurriness */
@@ -62,37 +60,9 @@ h1, h2, h3 {
     line-height: 1.2;
 }
 
-main h2 {
-    text-align: left; /* Ensure FAQ questions are aligned left */
-}
-
-/* Paragraphs */
 p {
     font-size: 1.2em;
     text-align: left; /* Align paragraphs left */
-}
-
-/* Button Default State */
-.cta-button {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1.2em;
-    color: #ff00ff; /* Hot pink text */
-    background-color: transparent; /* Fix: make the default background transparent */
-    text-decoration: none;
-    border: 2px solid #ff00ff; /* Hot pink border */
-    border-radius: 5px;
-    transition: all 0.3s ease; /* Smooth transition */
-}
-
-.cta-button:hover {
-    color: #00ff00; /* Green text on hover */
-    background-color: transparent;
-    border-color: #00ff00;
-    box-shadow: 0 0 8px #00ff00; /* Green glow effect */
-    transform: scale(1.05); /* Slightly enlarge */
-    cursor: pointer; /* Pointer cursor */
 }
 
 footer {
@@ -102,38 +72,4 @@ footer {
     border-top: 2px solid #00ff00;
     font-size: 1em;
     margin-top: 20px;
-}
-
-/* General link styles */
-a {
-    color: #ff4500; /* Bright orange for contrast */
-    text-decoration: underline;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: #ff6347; /* Slightly lighter orange on hover */
-}
-
-/* Navigation bar links - keep existing style */
-header .nav-list a {
-    color: #00ff00; /* Green for nav links */
-    text-decoration: none;
-    font-weight: normal;
-}
-
-header .nav-list a:hover {
-    color: #00aa00; /* Slightly darker green for hover */
-}
-
-/* Apply contrasting styles to non-nav links */
-body a:not(header .nav-list a) {
-    color: #ff4500; /* Bright orange */
-    text-decoration: underline;
-    font-weight: bold;
-}
-
-body a:not(header .nav-list a):hover {
-    color: #ff6347; /* Slightly lighter orange on hover */
 }
