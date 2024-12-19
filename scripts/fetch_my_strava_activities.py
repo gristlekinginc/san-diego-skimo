@@ -89,6 +89,7 @@ def create_html(activity):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon"> <!-- Favicon link -->
 </head>
 <body>
     <header>
@@ -118,6 +119,7 @@ def create_html(activity):
 """
     filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
     return filename, content
+
 
 
 # --- Generate index.json ---
