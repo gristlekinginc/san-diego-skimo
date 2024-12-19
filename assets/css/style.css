@@ -65,6 +65,16 @@ p {
     text-align: left; /* Align paragraphs left */
 }
 
+/* Current page (active) nav item */
+.nav-list .current {
+    color: #00ff00; /* Match the link color */
+    font-size: 1.5em; /* Keep the size consistent with links */
+    text-decoration: none; /* No underline */
+    pointer-events: none; /* Disable interaction */
+    cursor: default; /* Show default cursor */
+}
+
+
 footer {
     background-color: #000;
     color: #00ff00;
