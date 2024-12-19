@@ -3,61 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Journal</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-
+    <meta name="description" content="Daily updates and action logs for roller ski training in San Diego.">
+    <meta name="keywords" content="roller ski, skimo, San Diego, ski training">
+    <meta name="author" content="San Diego Skimo">
+    <link rel="stylesheet" href="styles.css">
+    <title>Action Journal | San Diego Skimo</title>
 </head>
 <body>
-    <header>
-        <h1>Action Journal</h1>
-        <nav>
-            <ul class="nav-list">
+    <header class="site-header">
+        <h1>San Diego Skimo</h1>
+        <nav class="main-nav">
+            <ul>
                 <li><a href="index.html">Home</a></li>
-                <li class="current">Action Journal</li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="action-journal.html">Action Journal</a></li>
+                <li><a href="posts.html">Blog Posts</a></li>
             </ul>
         </nav>
     </header>
 
-    <main>
-        <h2>Here are the latest workouts recorded in uphill skiing mecca San Diego</h2>
-        <div class="post-container" id="post-container"></div>
+    <main class="content">
+        <section class="workout-log">
+            <h2>Action Journal</h2>
+            <article class="workout-card">
+                <h3>Morning Roller Ski</h3>
+                <p><strong>Date:</strong> Dec 19, 2024</p>
+                <p><strong>Duration:</strong> 90 minutes</p>
+                <p><strong>Location:</strong> Mission Bay Park</p>
+                <p><strong>Notes:</strong> Focused on V2 technique, light wind.</p>
+            </article>
+
+            <article class="workout-card">
+                <h3>Evening Hill Climb</h3>
+                <p><strong>Date:</strong> Dec 19, 2024</p>
+                <p><strong>Duration:</strong> 60 minutes</p>
+                <p><strong>Location:</strong> Mount Soledad</p>
+                <p><strong>Notes:</strong> Challenging gradient, great sunset views.</p>
+            </article>
+        </section>
     </main>
 
-    <footer>
-        <p>&copy; 2024 San Diego Skimo Community</p>
+    <footer class="site-footer">
+        <p>&copy; 2024 San Diego Skimo. All rights reserved.</p>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-   <script>
-    async function loadPosts() {
-        const container = document.getElementById("post-container");
-
-        // Fetch index.json to get the list of posts
-        const response = await fetch("posts/index.json");
-        const posts = await response.json();
-
-        // Display the latest 5 posts
-        posts.slice(0, 5).forEach(post => {
-            const postHTML = `
-                <div class="post">
-                    <h2>${post.title}</h2>
-                    <p><strong>Date:</strong> ${post.date}</p>
-                    <p><strong>Distance:</strong> ${post.distance || "N/A"}</p>
-                    <p><strong>Elevation Gain:</strong> ${post.elevation || "N/A"}</p>
-                    <p><strong>Time:</strong> ${post.time || "N/A"}</p>
-                    <a href="posts/${post.filename}" class="cta-button">Read more</a>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', postHTML);
-        });
-    }
-
-    loadPosts();
-</script>
-
 </body>
 </html>
