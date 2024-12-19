@@ -80,6 +80,7 @@ p {
     transition: all 0.3s ease; /* Smooth transition */
 }
 
+
 /* Button Hover State */
 .cta-button:hover {
     color: #00ff00; /* Green text on hover */
