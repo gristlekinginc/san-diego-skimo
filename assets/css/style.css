@@ -157,5 +157,10 @@ a:hover {
 .post a:hover {
     color: #00aa00;
 }
+
+main {
+    text-align: left; /* Override center alignment */
+}
+
 <link rel="stylesheet" href="assets/css/style.css?v=1.2">
 
