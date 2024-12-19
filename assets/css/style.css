@@ -1,107 +1,71 @@
-/* Roller Ski Training Site - CSS Template */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* Base Terminal Theme */
 body {
-  font-family: 'Arial', sans-serif;
-  line-height: 1.6;
-  background: #f4f4f4;
-  color: #333;
-  margin: 0;
-  padding: 0;
+  background-color: #000;
+  color: #00ff00; /* Bright green text */
+  font-family: 'Courier New', Courier, monospace;
 }
 
-/* Global Styles */
-h1, h2, h3, h4, h5, h6 {
-  margin: 0 0 15px;
-  line-height: 1.2;
-}
-
-h1 {
-  font-size: 2.5rem;
-  color: #222;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-h2 {
-  font-size: 2rem;
-  color: #444;
-  text-transform: capitalize;
-}
-
-h3 {
-  font-size: 1.5rem;
-  color: #666;
-}
-
+/* Links */
 a {
-  color: #0077cc;
+  color: #00ff00;
   text-decoration: none;
 }
 
 a:hover {
+  color: #00cc00;
   text-decoration: underline;
 }
 
-/* Layout */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
+/* Header and Navigation */
 header {
-  background: #222;
-  color: #fff;
+  background: #111;
   padding: 20px 0;
   text-align: center;
+  border-bottom: 2px solid #00ff00;
 }
 
 nav ul {
   list-style: none;
-  text-align: center;
-  padding: 10px 0;
-  background: #333;
+  padding: 10px;
+  background: #111;
+  border-top: 2px solid #00ff00;
+  border-bottom: 2px solid #00ff00;
 }
 
 nav ul li {
   display: inline;
-  margin: 0 15px;
+  margin: 0 10px;
 }
 
 nav ul li a {
-  color: #fff;
   font-size: 1.2rem;
+  color: #00ff00;
 }
 
+/* Footer */
 footer {
-  background: #222;
-  color: #fff;
+  background: #111;
+  padding: 10px;
   text-align: center;
-  padding: 10px 0;
-  margin-top: 20px;
+  border-top: 2px solid #00ff00;
 }
 
-/* Retro Style Workout Card */
+/* Workout Cards */
 .workout-card {
-  background: #fff;
-  border: 2px solid #e1e1e1;
+  background: #111;
+  color: #00ff00;
+  border: 2px solid #00ff00;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin: 20px auto;
-  padding: 20px;
+  padding: 15px;
   max-width: 600px;
   font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
 }
 
 .workout-card h2 {
+  color: #00ff00;
   font-size: 1.8rem;
-  color: #333;
   margin-bottom: 10px;
 }
 
@@ -114,41 +78,22 @@ footer {
 
 .workout-card .stat {
   flex: 1 1 45%;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   margin: 5px;
   padding: 10px;
+  border: 1px solid #00ff00;
   text-align: center;
+  background: #000;
 }
 
 .workout-card .stat strong {
   display: block;
+  color: #00ff00;
   font-size: 1.2rem;
-  color: #0077cc;
 }
 
-.workout-card .description {
-  font-size: 1rem;
-  margin-top: 15px;
-}
-
-/* Media Queries for Responsiveness */
+/* Responsive Design */
 @media (max-width: 768px) {
-  .workout-card {
-    padding: 15px;
-  }
-
   .workout-card .stat {
     flex: 1 1 100%;
-    margin: 5px 0;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
   }
 }
