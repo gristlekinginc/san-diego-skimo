@@ -1,5 +1,13 @@
 [
     {
+        "title": "",
+        "date": "test-fav",
+        "distance": "N/A",
+        "elevation": "N/A",
+        "time": "N/A",
+        "filename": "test-fav.html"
+    },
+    {
         "title": "Roller ski the 15 incline to adams",
         "date": "2024-12-18",
         "distance": "1.03 miles",
