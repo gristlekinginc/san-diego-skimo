@@ -13,6 +13,11 @@ scripts/strava_tokens.json
 # Env file
 .env
 
+# Stupid macOS system files
+.DS_Store
+._*
+
+
 # Additional Ruby/bundler ignore for when you run: bundle install
 /vendor
 
