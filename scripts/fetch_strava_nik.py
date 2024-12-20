@@ -85,14 +85,61 @@ def filter_new_workouts(activities, existing_ids):
 # Prepend new workouts
 def prepend_new_workouts(file_path, new_snippets):
     try:
-        with open(file_path, "r+") as file:
-            existing_content = file.read()
-            file.seek(0)
-            file.write("\n".join(new_snippets) + "\n" + existing_content)
+        with open(file_path, "r") as file:
+            content = file.read()
+        
+        # Split the content to isolate the workout cards section
+        before_cards, cards_section, after_cards = re.split(
+            r"(<section id=\"workout-cards\">.*?</section>)", content, flags=re.DOTALL
+        )
+        
+        # Extract existing cards within the section
+        existing_cards = re.search(
+            r"<section id=\"workout-cards\">(.*?)</section>", cards_section, flags=re.DOTALL
+        ).group(1)
+
+        # Combine new cards with existing cards
+        updated_cards = "\n".join(new_snippets) + "\n" + existing_cards
+
+        # Reconstruct the HTML file
+        updated_content = (
+            before_cards +
+            f"<section id=\"workout-cards\">{updated_cards}</section>" +
+            after_cards
+        )
+
+        # Write back to the file
+        with open(file_path, "w") as file:
+            file.write(updated_content)
+    
     except FileNotFoundError:
         print(f"{file_path} not found. Creating a new file.")
+        # Create a new file with a default structure if it doesn't exist
         with open(file_path, "w") as file:
-            file.write("\n".join(new_snippets))
+            file.write(f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Journal</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="action-journal.html">Action Journal</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+        </ul>
+    </nav>
+    <h1>Action Journal</h1>
+    <section id="workout-cards">
+        {"".join(new_snippets)}
+    </section>
+</body>
+</html>""")
+
 
 # Main function
 def main():
