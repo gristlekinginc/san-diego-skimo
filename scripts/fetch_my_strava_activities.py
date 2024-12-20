@@ -72,6 +72,49 @@ def filter_roller_ski(activities):
                 filtered.append(activity)
     return filtered
 
+# Create action-journal.html page
+
+def generate_action_journal(posts_dir):
+    posts = []
+    for filename in os.listdir(posts_dir):
+        if filename.endswith(".html"):
+            with open(os.path.join(posts_dir, filename), "r") as f:
+                posts.append(f.read())
+
+    # Combine all posts into a single HTML page
+    combined_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Journal</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Action Journal</h1>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="action-journal.html">Action Journal</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {''.join(posts)}
+    </main>
+    <footer>
+        <p>&copy; 2024 San Diego Skimo Community</p>
+    </footer>
+</body>
+</html>
+"""
+    with open("action-journal.html", "w") as f:
+        f.write(combined_content)
+    print("Generated action-journal.html successfully!")
+
+
 # --- Create HTML Post ---
 def create_html(activity):
     # Parse activity details
@@ -189,21 +232,33 @@ def push_to_github(files):
 # --- Main ---
 if __name__ == "__main__":
     os.makedirs(POSTS_DIR, exist_ok=True)
+    
+    # Fetch and filter activities
     activities = fetch_my_activities()
     roller_ski_activities = filter_roller_ski(activities)
 
     files_to_push = []
+    
+    # Generate individual workout HTML files
     for activity in roller_ski_activities:
         filename, content = create_html(activity)
         with open(filename, "w") as f:
             f.write(content)
         files_to_push.append((filename, content))
-
+    
+    # Generate index.json
     generate_index(POSTS_DIR)
     with open(f"{POSTS_DIR}/index.json", "r") as f:
         files_to_push.append((f"{POSTS_DIR}/index.json", f.read()))
-
+    
+    # Generate action-journal.html
+    generate_action_journal(POSTS_DIR)
+    with open("action-journal.html", "r") as f:
+        files_to_push.append(("action-journal.html", f.read()))
+    
+    # Push to GitHub
     if files_to_push:
         push_to_github(files_to_push)
     else:
         print("No new Roller Ski activities found.")
+
