@@ -87,16 +87,21 @@ def prepend_new_workouts(file_path, new_snippets):
     try:
         with open(file_path, "r") as file:
             content = file.read()
-        
-        # Split the content to isolate the workout cards section
-        before_cards, cards_section, after_cards = re.split(
-            r"(<section id=\"workout-cards\">.*?</section>)", content, flags=re.DOTALL
-        )
-        
-        # Extract existing cards within the section
-        existing_cards = re.search(
-            r"<section id=\"workout-cards\">(.*?)</section>", cards_section, flags=re.DOTALL
-        ).group(1)
+
+        # Attempt to split the content
+        try:
+            before_cards, cards_section, after_cards = re.split(
+                r"(<section id=\"workout-cards\">.*?</section>)", content, flags=re.DOTALL
+            )
+            existing_cards = re.search(
+                r"<section id=\"workout-cards\">(.*?)</section>", cards_section, flags=re.DOTALL
+            ).group(1)
+        except (ValueError, AttributeError):
+            # If no <section> exists, initialize the structure
+            print("No workout cards section found. Initializing new section.")
+            before_cards = content
+            existing_cards = ""
+            after_cards = ""
 
         # Combine new cards with existing cards
         updated_cards = "\n".join(new_snippets) + "\n" + existing_cards
@@ -111,7 +116,7 @@ def prepend_new_workouts(file_path, new_snippets):
         # Write back to the file
         with open(file_path, "w") as file:
             file.write(updated_content)
-    
+
     except FileNotFoundError:
         print(f"{file_path} not found. Creating a new file.")
         # Create a new file with a default structure if it doesn't exist
@@ -139,6 +144,7 @@ def prepend_new_workouts(file_path, new_snippets):
     </section>
 </body>
 </html>""")
+
 
 
 # Main function
