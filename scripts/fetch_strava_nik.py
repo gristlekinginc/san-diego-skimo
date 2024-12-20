@@ -53,6 +53,7 @@ def filter_rollerski_activities(activities):
 # Generate HTML snippet
 def generate_html_snippet(activity):
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
+    description = activity.get("description", "No description.")  # Safely get the description
     template = f"""
     <div class="workout-card">
         <h2>{activity["name"]}</h2>
@@ -62,7 +63,7 @@ def generate_html_snippet(activity):
         <p><strong>Moving Time:</strong> {activity["moving_time"] // 60} min</p>
         <p><strong>Avg HR:</strong> {activity.get("average_heartrate", "N/A")}</p>
         <p><strong>Max HR:</strong> {activity.get("max_heartrate", "N/A")}</p>
-        <p><strong>Description:</strong> {activity.get("description", "No description.")}</p>
+        <p><strong>Description:</strong> {description}</p>
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
