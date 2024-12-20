@@ -2,7 +2,7 @@ import os
 import requests
 import datetime
 import json
-import markdown  # Import the markdown library to convert Markdown to HTML
+from github import Github
 
 # --- Configuration ---
 TOKEN_FILE = "strava_tokens.json"
@@ -32,11 +32,15 @@ def refresh_access_token():
     response.raise_for_status()
     tokens = response.json()
 
+    # Debug: Print tokens
+    print("Access token refreshed successfully!")
+    print("Access token loaded successfully!")
+
+
     # Save updated tokens to file
     with open(TOKEN_FILE, "w") as f:
         json.dump(tokens, f)
-    
-    print("Access token refreshed successfully!")
+
     return tokens["access_token"]
 
 # --- Load Access Token ---
@@ -57,8 +61,22 @@ def fetch_my_activities():
     params = {"per_page": 30}
     
     response = requests.get(url, headers=headers, params=params)
+    print("API Response Status Code:", response.status_code)
+    
+    if response.status_code == 401:
+        print("Error: Unauthorized. Check access token permissions.")
+        raise Exception("401 Unauthorized - Check access token or scope permissions.")
+    
     response.raise_for_status()
-    return response.json()
+    activities = response.json()
+
+    if not activities:
+        print("No activities returned by the API.")
+        return []
+
+    return activities
+
+
 
 def filter_roller_ski(activities):
     filtered = []
@@ -72,139 +90,31 @@ def filter_roller_ski(activities):
                 filtered.append(activity)
     return filtered
 
-# Create action-journal.html page
-
-def generate_action_journal(posts_dir):
-    posts = []
-    for filename in os.listdir(posts_dir):
-        if filename.endswith(".html"):
-            with open(os.path.join(posts_dir, filename), "r") as f:
-                posts.append(f.read())
-
-    # Combine all posts into a single HTML page
-    combined_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Journal</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>Action Journal</h1>
-        <nav>
-            <ul class="nav-list">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="action-journal.html">Action Journal</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        {''.join(posts)}
-    </main>
-    <footer>
-        <p>&copy; 2024 San Diego Skimo Community</p>
-    </footer>
-</body>
-</html>
-"""
-    with open("action-journal.html", "w") as f:
-        f.write(combined_content)
-    print("Generated action-journal.html successfully!")
-
-
-# --- Create HTML Post ---
-def create_html(activity):
-    # Parse activity details
+# --- Create Markdown Post ---
+def create_markdown(activity):
     date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
     title = activity["name"]
-    description = activity.get("description", "No description provided").strip()
-    distance = round(activity["distance"] / 1609, 2)  # Convert meters to miles
-    elevation = round(activity.get("total_elevation_gain", 0), 1)  # Default to 0 if missing
-    time = round(activity["moving_time"] / 60, 1)  # Convert seconds to minutes
-    map_link = f"https://www.strava.com/activities/{activity['id']}"  # Generate activity link
+    distance = round(activity["distance"] / 1609, 2)  # meters to miles
+    elevation = round(activity["total_elevation_gain"], 1)
+    time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
 
-    # Generate HTML content
-    content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon"> <!-- Favicon link -->
-</head>
-<body>
-    <header>
-        <h1>Action Journal</h1>
-        <nav>
-            <ul class="nav-list">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../action-journal.html">Action Journal</a></li>
-                <li><a href="../contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+    content = f"""---
+title: "{title}"
+date: {date}
+tags: roller ski, san diego
+---
 
-    <div class="post-container">
-        <h1>{title}</h1>
-        <p><strong>Date:</strong> {date}</p>
-        <p><strong>Distance:</strong> {distance} miles</p>
-        <p><strong>Elevation Gain:</strong> {elevation} ft</p>
-        <p><strong>Time:</strong> {time} minutes</p>
-        <h2>Description</h2>
-        <p>{description if description else "No description provided"}</p>
-        <h2>Map</h2>
-        <p><a href="{map_link}" target="_blank">View Activity on Strava</a></p>
-    </div>
-</body>
-</html>
+### Stats
+- **Distance**: {distance} miles
+- **Elevation Gain**: {elevation} ft
+- **Time**: {time} minutes
+
+### Map
+[View Activity on Strava](https://www.strava.com/activities/{activity['id']})
 """
-    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.html"
+    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
     return filename, content
-
-
-
-
-# --- Generate index.json ---
-def generate_index(posts_dir):
-    posts = []
-    for filename in os.listdir(posts_dir):
-        if filename.endswith(".html"):
-            parts = filename.replace('.html', '').split('-')
-            date = '-'.join(parts[:3])  # Extract YYYY-MM-DD
-            title = ' '.join(parts[3:]).capitalize()
-
-            # Extract metadata directly from HTML file
-            with open(os.path.join(posts_dir, filename), "r") as f:
-                content = f.read()
-                distance = extract_metadata(content, "Distance:")
-                elevation = extract_metadata(content, "Elevation Gain:")
-                time = extract_metadata(content, "Time:")
-
-            posts.append({
-                "title": title,
-                "date": date,
-                "distance": distance,
-                "elevation": elevation,
-                "time": time,
-                "filename": filename
-            })
-
-    posts.sort(key=lambda x: x["date"], reverse=True)
-
-    with open(os.path.join(posts_dir, "index.json"), "w") as f:
-        json.dump(posts, f, indent=4)
-    print("Generated index.json successfully!")
-
-def extract_metadata(content, key):
-    """Extract metadata value for a given key from HTML content."""
-    import re
-    match = re.search(f"<p><strong>{key}</strong> (.*?)</p>", content)
-    return match.group(1) if match else "N/A"
-
+  
 
 # --- Push to GitHub ---
 def push_to_github(files):
@@ -216,49 +126,35 @@ def push_to_github(files):
         try:
             existing_file = None
             try:
+                # Check if the file already exists
                 existing_file = repo.get_contents(filepath)
             except Exception:
-                pass
+                pass  # File does not exist
             
             if existing_file:
-                repo.update_file(filepath, f"Update file: {filepath}", content, existing_file.sha)
+                repo.update_file(filepath, f"Update blog post for {filepath}", content, existing_file.sha)
                 print(f"Updated: {filepath}")
             else:
-                repo.create_file(filepath, f"Add file: {filepath}", content)
+                repo.create_file(filepath, f"Add blog post for {filepath}", content)
                 print(f"Created: {filepath}")
         except Exception as e:
             print(f"Error creating/updating {filepath}: {e}")
 
+
 # --- Main ---
 if __name__ == "__main__":
     os.makedirs(POSTS_DIR, exist_ok=True)
-    
-    # Fetch and filter activities
     activities = fetch_my_activities()
     roller_ski_activities = filter_roller_ski(activities)
 
     files_to_push = []
-    
-    # Generate individual workout HTML files
     for activity in roller_ski_activities:
-        filename, content = create_html(activity)
+        filename, content = create_markdown(activity)
         with open(filename, "w") as f:
             f.write(content)
         files_to_push.append((filename, content))
-    
-    # Generate index.json
-    generate_index(POSTS_DIR)
-    with open(f"{POSTS_DIR}/index.json", "r") as f:
-        files_to_push.append((f"{POSTS_DIR}/index.json", f.read()))
-    
-    # Generate action-journal.html
-    generate_action_journal(POSTS_DIR)
-    with open("action-journal.html", "r") as f:
-        files_to_push.append(("action-journal.html", f.read()))
-    
-    # Push to GitHub
+
     if files_to_push:
         push_to_github(files_to_push)
     else:
         print("No new Roller Ski activities found.")
-
