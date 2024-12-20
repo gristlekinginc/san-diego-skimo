@@ -32,10 +32,14 @@ def fetch_activities(token):
         headers = {"Authorization": f"Bearer {token}"}
         response = requests.get(ACTIVITIES_URL, headers=headers, params=params)
         response.raise_for_status()
-        return response.json()
+        activities = response.json()
+        # Debug: Print the first activity's data to inspect fields
+        print("First activity data:", activities[0])
+        return activities
     except requests.exceptions.RequestException as e:
         print(f"Error fetching activities: {e}")
         return []
+
 
 # Filter rollerski activities within San Diego boundaries
 def filter_rollerski_activities(activities):
