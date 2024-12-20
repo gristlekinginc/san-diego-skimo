@@ -1,7 +1,4 @@
-# This .gitignore is appropriate for repositories deployed to GitHub Pages and using
-# a Gemfile as specified at https://github.com/github/pages-gem#conventional
-
-# Basic Jekyll gitignores (synchronize to Jekyll.gitignore)
+# Basic Jekyll gitignores
 _site/
 .sass-cache/
 .jekyll-cache/
@@ -10,26 +7,37 @@ _site/
 # Access Token refresh
 scripts/strava_tokens.json
 
-# Env file
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Ignore environment configuration
 .env
 
-# Stupid macOS system files
+# Ignore intermediate or generated files
+/templates/action-journal.html
+/static/*.min.css
+/static/*.min.js
+
+# Ignore macOS system files
 .DS_Store
 ._*
+Thumbs.db
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.bak
 
 # Virtual environment
 sdskimo-venv/
 
-# Python dependencies file
-requirements.txt
+# Additional Python-related exclusions
+*.ipynb_checkpoints/
 
-
-# Additional Ruby/bundler ignore for when you run: bundle install
+# Additional Ruby/Bundler ignores
 /vendor
 
-# Specific ignore for GitHub Pages
-# GitHub Pages will always use its own deployed version of pages-gem 
-# This means GitHub Pages will NOT use your Gemfile.lock and therefore it is
-# counterproductive to check this file into the repository.
-# Details at https://github.com/github/pages-gem/issues/768
+# GitHub Pages specific exclusions
 Gemfile.lock
