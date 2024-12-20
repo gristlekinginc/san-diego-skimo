@@ -30,6 +30,9 @@ jobs:
         STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
       run: python scripts/fetch_strava_nik.py
 
+    - name: Copy Updated HTML to Root
+      run: cp templates/action-journal.html action-journal.html
+
     - name: Commit and Push Changes
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
