@@ -25,21 +25,33 @@ def refresh_access_token():
         print(f"Error refreshing token: {e}")
         return None
 
-# Fetch activities
-def fetch_activities(token):
+# Fetch activities with full details
+def fetch_detailed_activities(token):
     try:
         params = {"per_page": 30}  # Adjust as needed
         headers = {"Authorization": f"Bearer {token}"}
         response = requests.get(ACTIVITIES_URL, headers=headers, params=params)
         response.raise_for_status()
         activities = response.json()
-        # Debug: Print the first activity's data to inspect fields
-        print("First activity data:", activities[0])
-        return activities
+
+        # Fetch full details for each activity
+        detailed_activities = []
+        for activity in activities:
+            activity_id = activity["id"]
+            details_url = f"https://www.strava.com/api/v3/activities/{activity_id}"
+            try:
+                details_response = requests.get(details_url, headers=headers)
+                details_response.raise_for_status()
+                detailed_activity = details_response.json()
+                detailed_activities.append(detailed_activity)
+                print(f"Fetched detailed activity: {detailed_activity['name']}")
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching details for activity {activity_id}: {e}")
+        return detailed_activities
+
     except requests.exceptions.RequestException as e:
         print(f"Error fetching activities: {e}")
         return []
-
 
 # Filter rollerski activities within San Diego boundaries
 def filter_rollerski_activities(activities):
@@ -57,7 +69,7 @@ def filter_rollerski_activities(activities):
 # Generate HTML snippet
 def generate_html_snippet(activity):
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
-    description = activity.get("description", "No description.")  # Safely get the description
+    description = activity.get("description", "No description.")
     template = f"""
     <div class="workout-card">
         <h2>{activity["name"]}</h2>
@@ -71,6 +83,7 @@ def generate_html_snippet(activity):
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
+    print(f"Generated snippet for {activity['name']} with description: {description}")
     return template
 
 # Extract existing workout IDs
@@ -150,16 +163,15 @@ def prepend_new_workouts(file_path, new_snippets):
 </body>
 </html>""")
 
-
-
 # Main function
 def main():
     token = refresh_access_token()
     if not token:
         print("Failed to refresh access token. Exiting.")
         return
-    
-    activities = fetch_activities(token)
+
+    # Fetch detailed activities including descriptions
+    activities = fetch_detailed_activities(token)
     filtered_activities = filter_rollerski_activities(activities)
     existing_ids = get_existing_workout_ids("templates/action-journal.html")
     new_activities = filter_new_workouts(filtered_activities, existing_ids)
