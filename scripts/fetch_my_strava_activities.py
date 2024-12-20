@@ -1,160 +1,74 @@
-import os
 import requests
-import datetime
-import json
-from github import Github
+import os
+from datetime import datetime
 
-# --- Configuration ---
-TOKEN_FILE = "strava_tokens.json"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-REPO_NAME = "gristlekinginc/san-diego-skimo"  # Replace with your repo name
-POSTS_DIR = "posts"  # Directory for blog posts
+# Strava API setup
+CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
+CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
+REFRESH_TOKEN = os.getenv("STRAVA_REFRESH_TOKEN")
+TOKEN_URL = "https://www.strava.com/oauth/token"
+ACTIVITIES_URL = "https://www.strava.com/api/v3/activities"
 
-# San Diego County Bounding Box
-SAN_DIEGO_BOUNDS = {
-    "sw_lat": 32.5343,
-    "sw_lng": -117.1219,
-    "ne_lat": 33.1145,
-    "ne_lng": -116.0856,
-}
-
-# --- Refresh Access Token ---
+# Refresh access token
 def refresh_access_token():
-    url = "https://www.strava.com/oauth/token"
-    payload = {
-        "client_id": os.getenv("STRAVA_CLIENT_ID"),
-        "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
-        "grant_type": "refresh_token",
-        "refresh_token": os.getenv("STRAVA_REFRESH_TOKEN"),
+    response = requests.post(TOKEN_URL, data={
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "refresh_token": REFRESH_TOKEN,
+        "grant_type": "refresh_token"
+    })
+    response.raise_for_status()
+    return response.json()["access_token"]
+
+# Fetch activities
+def fetch_activities(token):
+    params = {"per_page": 30}  # Adjust as needed
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(ACTIVITIES_URL, headers=headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+# Filter rollerski activities within San Diego boundaries
+def filter_rollerski_activities(activities):
+    san_diego_bounds = {
+        "lat_min": 32.5343, "lat_max": 33.1144,
+        "lon_min": -117.292, "lon_max": -116.984
     }
+    return [
+        a for a in activities
+        if "RollerSki" in a.get("type", "") and
+           san_diego_bounds["lat_min"] <= a["start_latlng"][0] <= san_diego_bounds["lat_max"] and
+           san_diego_bounds["lon_min"] <= a["start_latlng"][1] <= san_diego_bounds["lon_max"]
+    ]
 
-    response = requests.post(url, data=payload)
-    response.raise_for_status()
-    tokens = response.json()
+# Generate HTML snippet
+def generate_html_snippet(activity):
+    template = f"""
+    <div class="workout-card">
+        <h2>{activity["name"]}</h2>
+        <p><strong>Date:</strong> {datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")}</p>
+        <p><strong>Distance:</strong> {activity["distance"] / 1000:.2f} km</p>
+        <p><strong>Elevation Gain:</strong> {activity["total_elevation_gain"]} m</p>
+        <p><strong>Moving Time:</strong> {activity["moving_time"] // 60} min</p>
+        <p><strong>Avg HR:</strong> {activity.get("average_heartrate", "N/A")}</p>
+        <p><strong>Max HR:</strong> {activity.get("max_heartrate", "N/A")}</p>
+        <p><strong>Description:</strong> {activity.get("description", "No description.")}</p>
+        <a href="{activity["url"]}" target="_blank">View on Strava</a>
+    </div>
+    """
+    return template
 
-    # Debug: Print tokens
-    print("Access token refreshed successfully!")
-    print("Access token loaded successfully!")
+# Main function
+def main():
+    token = refresh_access_token()
+    activities = fetch_activities(token)
+    filtered_activities = filter_rollerski_activities(activities)
+    snippets = [generate_html_snippet(a) for a in filtered_activities]
 
+    with open("../templates/action-journal.html", "r+") as file:
+        content = file.read()
+        file.seek(0)
+        file.write("\n".join(snippets) + "\n" + content)
 
-    # Save updated tokens to file
-    with open(TOKEN_FILE, "w") as f:
-        json.dump(tokens, f)
-
-    return tokens["access_token"]
-
-# --- Load Access Token ---
-def load_access_token():
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, "r") as f:
-            tokens = json.load(f)
-        return tokens["access_token"]
-    return refresh_access_token()
-
-# Assign the ACCESS_TOKEN here
-ACCESS_TOKEN = load_access_token()
-
-# --- Strava API ---
-def fetch_my_activities():
-    url = "https://www.strava.com/api/v3/athlete/activities"
-    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
-    params = {"per_page": 30}
-    
-    response = requests.get(url, headers=headers, params=params)
-    print("API Response Status Code:", response.status_code)
-    
-    if response.status_code == 401:
-        print("Error: Unauthorized, 401. Check access token or scope permissions.")
-        raise Exception("401 Unauthorized - Check access token or scope permissions.")
-    
-    response.raise_for_status()
-    activities = response.json()
-
-    if not activities:
-        print("No activities returned by the API.")
-        return []
-
-    return activities
-
-
-
-def filter_roller_ski(activities):
-    filtered = []
-    for activity in activities:
-        if activity["type"] == "RollerSki":
-            latlng = activity.get("start_latlng", [])
-            if latlng and (
-                SAN_DIEGO_BOUNDS["sw_lat"] <= latlng[0] <= SAN_DIEGO_BOUNDS["ne_lat"]
-                and SAN_DIEGO_BOUNDS["sw_lng"] <= latlng[1] <= SAN_DIEGO_BOUNDS["ne_lng"]
-            ):
-                filtered.append(activity)
-    return filtered
-
-# --- Create Markdown Post ---
-def create_markdown(activity):
-    date = datetime.datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").date()
-    title = activity["name"]
-    distance = round(activity["distance"] / 1609, 2)  # meters to miles
-    elevation = round(activity["total_elevation_gain"], 1)
-    time = round(activity["moving_time"] / 60, 1)  # seconds to minutes
-
-    content = f"""---
-title: "{title}"
-date: {date}
-tags: roller ski, san diego
----
-
-### Stats
-- **Distance**: {distance} miles
-- **Elevation Gain**: {elevation} ft
-- **Time**: {time} minutes
-
-### Map
-[View Activity on Strava](https://www.strava.com/activities/{activity['id']})
-"""
-    filename = f"{POSTS_DIR}/{date}-{title.replace(' ', '-').lower()}.md"
-    return filename, content
-  
-
-# --- Push to GitHub ---
-def push_to_github(files):
-    print("Repository Name:", REPO_NAME)
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(REPO_NAME)
-
-    for filepath, content in files:
-        try:
-            existing_file = None
-            try:
-                # Check if the file already exists
-                existing_file = repo.get_contents(filepath)
-            except Exception:
-                pass  # File does not exist
-            
-            if existing_file:
-                repo.update_file(filepath, f"Update blog post for {filepath}", content, existing_file.sha)
-                print(f"Updated: {filepath}")
-            else:
-                repo.create_file(filepath, f"Add blog post for {filepath}", content)
-                print(f"Created: {filepath}")
-        except Exception as e:
-            print(f"Error creating/updating {filepath}: {e}")
-
-
-# --- Main ---
 if __name__ == "__main__":
-    os.makedirs(POSTS_DIR, exist_ok=True)
-    activities = fetch_my_activities()
-    roller_ski_activities = filter_roller_ski(activities)
-
-    files_to_push = []
-    for activity in roller_ski_activities:
-        filename, content = create_markdown(activity)
-        with open(filename, "w") as f:
-            f.write(content)
-        files_to_push.append((filename, content))
-
-    if files_to_push:
-        push_to_github(files_to_push)
-    else:
-        print("No new Roller Ski activities found.")
+    main()
