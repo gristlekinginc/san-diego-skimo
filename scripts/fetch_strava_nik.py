@@ -80,7 +80,7 @@ def main():
     snippets = [generate_html_snippet(a) for a in filtered_activities]
 
     try:
-        with open("../templates/action-journal.html", "r+") as file:
+        with open("templates/action-journal.html", "r+") as file:
             content = file.read()
             file.seek(0)
             file.write("\n".join(snippets) + "\n" + content)
