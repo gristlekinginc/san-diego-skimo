@@ -1,3 +1,16 @@
+/* Mobile Styling */
+@media (max-width: 768px) {
+    .navbar ul {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+    .navbar li {
+        margin: 5px 0;
+    }
+}
+
+/* Regular Styling */
 body {
     background-color: #000000;
     color: #fffdff;
