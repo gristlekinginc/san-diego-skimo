@@ -1,99 +1,147 @@
-/* Base Terminal Theme */
+/* Atari-like Retro Style */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 body {
-  background-color: #000;
-  color: #00ff00; /* Bright green text */
-  font-family: 'Cousine', Courier, monospace;
+    font-family: 'VT323', monospace; /* Retro pixel-style font */
+    margin: 0;
+    padding: 0;
+    background-color: #000; /* Black background */
+    color: #00ff00; /* Green text */
+    line-height: 1.6;
+    text-align: center;
 }
 
-/* Links */
-a {
-  color: #00ff00;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #00cc00;
-  text-decoration: underline;
-}
-
-/* Header and Navigation */
 header {
-  background: #111;
-  padding: 20px 0;
-  text-align: center;
-  border-bottom: 2px solid #00ff00;
+    background-color: #000;
+    border-bottom: 2px solid #00ff00;
+    padding: 10px 0;
+    text-align: center;
 }
 
-nav ul {
-  list-style: none;
-  padding: 10px;
-  background: #111;
-  border-top: 2px solid #00ff00;
-  border-bottom: 2px solid #00ff00;
+header .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
-nav ul li {
-  display: inline;
-  margin: 0 10px;
+header .nav-list li {
+    margin: 0 20px;
 }
 
-nav ul li a {
-  font-size: 1.2rem;
-  color: #00ff00;
+header .nav-list a {
+    color: #00ff00;
+    text-decoration: none;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+header .nav-list a:hover {
+    color: #00aa00; /* Slightly darker green for hover */
+}
+
+main {
+    margin: 40px auto;
+    max-width: 800px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    margin-bottom: 20px;
+}
+
+/* Paragraphs */
+p {
+    font-size: 1.2em;
+}
+
+/* Buttons */
+.cta-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: #000;
+    background-color: #00ff00;
+    text-decoration: none;
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #000;
+    color: #00ff00;
+    border-color: #00aa00;
 }
 
 /* Footer */
 footer {
-  background: #111;
-  padding: 10px;
-  text-align: center;
-  border-top: 2px solid #00ff00;
+    background-color: #000;
+    color: #00ff00;
+    padding: 10px 0;
+    border-top: 2px solid #00ff00;
+    font-size: 1em;
+    margin-top: 20px;
 }
 
-/* Workout Cards */
-.workout-card {
-  background: #111;
-  color: #00ff00;
-  border: 2px solid #00ff00;
-  border-radius: 8px;
-  margin: 20px auto;
-  padding: 15px;
-  max-width: 600px;
-  font-family: 'Courier New', Courier, monospace;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+a {
+    color: #00ff00;
+    text-decoration: none;
 }
 
-.workout-card h2 {
-  color: #00ff00;
-  font-size: 1.8rem;
-  margin-bottom: 10px;
+a:hover {
+    color: #00aa00;
 }
 
-.workout-card .stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 10px 0;
+/* New Styles for Posts */
+.post-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #111; /* Slightly lighter black for contrast */
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #00ff00;
 }
 
-.workout-card .stat {
-  flex: 1 1 45%;
-  margin: 5px;
-  padding: 10px;
-  border: 1px solid #00ff00;
-  text-align: center;
-  background: #000;
+.post {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #000;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    text-align: left;
 }
 
-.workout-card .stat strong {
-  display: block;
-  color: #00ff00;
-  font-size: 1.2rem;
+.post h2 {
+    color: #00ff00;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+    text-shadow: 0 0 3px #00ff00;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .workout-card .stat {
-    flex: 1 1 100%;
-  }
+.post pre {
+    background-color: #111;
+    color: #00ff00;
+    padding: 15px;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+}
+
+.post a {
+    color: #00ff00;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.post a:hover {
+    color: #00aa00;
 }
