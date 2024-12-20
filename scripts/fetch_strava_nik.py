@@ -1,79 +1,115 @@
 import requests
 import os
 import re
+import logging
 from datetime import datetime
+from typing import List, Dict, Any, Optional
 
-# Strava API setup
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s]: %(message)s')
+
+# Constants for Strava API
 CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
 CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 REFRESH_TOKEN = os.getenv("STRAVA_REFRESH_TOKEN")
 TOKEN_URL = "https://www.strava.com/oauth/token"
 ACTIVITIES_URL = "https://www.strava.com/api/v3/activities"
+ACTIVITY_DETAILS_URL = "https://www.strava.com/api/v3/activities/{activity_id}"
 
-# Refresh access token
-def refresh_access_token():
+SAN_DIEGO_BOUNDS = {
+    "lat_min": 32.5343,
+    "lat_max": 33.1144,
+    "lon_min": -117.292,
+    "lon_max": -116.984,
+}
+
+HTML_FILE_PATH = "templates/action-journal.html"
+
+
+def refresh_access_token() -> Optional[str]:
+    """Fetch a new access token using the refresh token."""
     try:
-        response = requests.post(TOKEN_URL, data={
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "refresh_token": REFRESH_TOKEN,
-            "grant_type": "refresh_token"
-        })
+        response = requests.post(
+            TOKEN_URL,
+            data={
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET,
+                "refresh_token": REFRESH_TOKEN,
+                "grant_type": "refresh_token",
+            },
+            timeout=10,
+        )
         response.raise_for_status()
-        return response.json()["access_token"]
+        token = response.json().get("access_token")
+        if not token:
+            logging.error("No access_token found in the refresh token response.")
+        return token
     except requests.exceptions.RequestException as e:
-        print(f"Error refreshing token: {e}")
+        logging.error(f"Error refreshing token: {e}")
         return None
 
-# Fetch activities with full details
-def fetch_detailed_activities(token):
+
+def fetch_summary_activities(token: str, per_page: int = 30) -> List[Dict[str, Any]]:
+    """Fetch a summary of activities from the Strava API."""
+    headers = {"Authorization": f"Bearer {token}"}
     try:
-        params = {"per_page": 30}  # Adjust as needed
-        headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(ACTIVITIES_URL, headers=headers, params=params)
+        response = requests.get(ACTIVITIES_URL, headers=headers, params={"per_page": per_page}, timeout=10)
         response.raise_for_status()
         activities = response.json()
-
-        # Fetch full details for each activity
-        detailed_activities = []
-        for activity in activities:
-            activity_id = activity["id"]
-            details_url = f"https://www.strava.com/api/v3/activities/{activity_id}"
-            try:
-                details_response = requests.get(details_url, headers=headers)
-                details_response.raise_for_status()
-                detailed_activity = details_response.json()
-                detailed_activities.append(detailed_activity)
-                print(f"Fetched detailed activity: {detailed_activity['name']}")
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching details for activity {activity_id}: {e}")
-        return detailed_activities
-
+        logging.info(f"Fetched {len(activities)} summary activities.")
+        return activities
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching activities: {e}")
+        logging.error(f"Error fetching activities: {e}")
         return []
 
-# Filter rollerski activities within San Diego boundaries
-def filter_rollerski_activities(activities):
-    san_diego_bounds = {
-        "lat_min": 32.5343, "lat_max": 33.1144,
-        "lon_min": -117.292, "lon_max": -116.984
-    }
-    return [
-        a for a in activities
-        if "RollerSki" in a.get("type", "") and
-           san_diego_bounds["lat_min"] <= a["start_latlng"][0] <= san_diego_bounds["lat_max"] and
-           san_diego_bounds["lon_min"] <= a["start_latlng"][1] <= san_diego_bounds["lon_max"]
-    ]
 
-# Generate HTML snippet
-def generate_html_snippet(activity):
+def fetch_detailed_activities(token: str, activity_ids: List[str]) -> List[Dict[str, Any]]:
+    """Fetch detailed activities for the given activity IDs."""
+    headers = {"Authorization": f"Bearer {token}"}
+    detailed_activities = []
+    for activity_id in activity_ids:
+        try:
+            response = requests.get(ACTIVITY_DETAILS_URL.format(activity_id=activity_id), headers=headers, timeout=10)
+            response.raise_for_status()
+            detailed_activity = response.json()
+            detailed_activities.append(detailed_activity)
+            logging.info(f"Fetched detailed activity: {detailed_activity.get('name', 'Unnamed')}")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error fetching details for activity {activity_id}: {e}")
+    return detailed_activities
+
+
+def is_activity_in_san_diego(activity: Dict[str, Any]) -> bool:
+    """Check if the activity start location is within San Diego boundaries."""
+    start_latlng = activity.get("start_latlng", [None, None])
+    lat, lon = start_latlng[0], start_latlng[1]
+    return (
+        lat is not None
+        and lon is not None
+        and SAN_DIEGO_BOUNDS["lat_min"] <= lat <= SAN_DIEGO_BOUNDS["lat_max"]
+        and SAN_DIEGO_BOUNDS["lon_min"] <= lon <= SAN_DIEGO_BOUNDS["lon_max"]
+    )
+
+
+def filter_rollerski_activities(activities: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Filter activities for RollerSki type within San Diego boundaries."""
+    filtered = [
+        a for a in activities
+        if a.get("type") == "RollerSki" and is_activity_in_san_diego(a)
+    ]
+    logging.info(f"Filtered down to {len(filtered)} RollerSki activities in San Diego.")
+    return filtered
+
+
+def generate_html_snippet(activity: Dict[str, Any]) -> str:
+    """Generate an HTML snippet for a given activity."""
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
     description = activity.get("description", "No description.")
-    template = f"""
+    formatted_date = datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")
+    return f"""
     <div class="workout-card">
-        <h2>{activity["name"]}</h2>
-        <p><strong>Date:</strong> {datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")}</p>
+        <h2>{activity.get("name", "Untitled")}</h2>
+        <p><strong>Date:</strong> {formatted_date}</p>
         <p><strong>Distance:</strong> {activity["distance"] / 1000:.2f} km</p>
         <p><strong>Elevation Gain:</strong> {activity["total_elevation_gain"]} m</p>
         <p><strong>Moving Time:</strong> {activity["moving_time"] // 60} min</p>
@@ -83,62 +119,52 @@ def generate_html_snippet(activity):
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
-    print(f"Generated snippet for {activity['name']} with description: {description}")
-    return template
 
-# Extract existing workout IDs
-def get_existing_workout_ids(file_path):
+
+def get_existing_workout_ids(file_path: str) -> List[str]:
+    """Extract existing workout IDs from the HTML file."""
     try:
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
-            return re.findall(r"https://www.strava.com/activities/(\d+)", content)
+            ids = re.findall(r"https://www\.strava\.com/activities/(\d+)", content)
+            logging.info(f"Found {len(ids)} existing workout IDs.")
+            return ids
     except FileNotFoundError:
-        print(f"{file_path} not found. Assuming no existing workouts.")
+        logging.info(f"{file_path} not found. Assuming no existing workouts.")
         return []
 
-# Filter new workouts
-def filter_new_workouts(activities, existing_ids):
-    return [a for a in activities if str(a["id"]) not in existing_ids]
 
-# Prepend new workouts
-def prepend_new_workouts(file_path, new_snippets):
+def prepend_new_workouts(file_path: str, new_snippets: List[str]) -> None:
+    """Prepend new workout snippets to the HTML file."""
+    if not new_snippets:
+        logging.info("No new snippets to prepend.")
+        return
+
     try:
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
 
-        # Attempt to split the content
-        try:
-            before_cards, cards_section, after_cards = re.split(
-                r"(<section id=\"workout-cards\">.*?</section>)", content, flags=re.DOTALL
+        match = re.search(r"(<section id=\"workout-cards\">.*?</section>)", content, flags=re.DOTALL)
+        if match:
+            updated_content = content.replace(
+                match.group(0),
+                f"<section id=\"workout-cards\">\n{''.join(new_snippets)}\n{match.group(0)}</section>",
             )
-            existing_cards = re.search(
-                r"<section id=\"workout-cards\">(.*?)</section>", cards_section, flags=re.DOTALL
-            ).group(1)
-        except (ValueError, AttributeError):
-            # If no <section> exists, initialize the structure
-            print("No workout cards section found. Initializing new section.")
-            before_cards = content
-            existing_cards = ""
-            after_cards = ""
+        else:
+            logging.warning("No workout cards section found. Adding new section.")
+            updated_content = f"""
+            {content}
+            <section id="workout-cards">
+                {''.join(new_snippets)}
+            </section>
+            """
 
-        # Combine new cards with existing cards
-        updated_cards = "\n".join(new_snippets) + "\n" + existing_cards
-
-        # Reconstruct the HTML file
-        updated_content = (
-            before_cards +
-            f"<section id=\"workout-cards\">{updated_cards}</section>" +
-            after_cards
-        )
-
-        # Write back to the file
-        with open(file_path, "w") as file:
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(updated_content)
-
+        logging.info("Prepended new workouts successfully.")
     except FileNotFoundError:
-        print(f"{file_path} not found. Creating a new file.")
-        # Create a new file with a default structure if it doesn't exist
-        with open(file_path, "w") as file:
+        logging.warning(f"{file_path} not found. Creating a new file with basic structure.")
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,25 +184,27 @@ def prepend_new_workouts(file_path, new_snippets):
     </nav>
     <h1>Action Journal</h1>
     <section id="workout-cards">
-        {"".join(new_snippets)}
+        {''.join(new_snippets)}
     </section>
 </body>
 </html>""")
 
-# Main function
+
 def main():
     token = refresh_access_token()
     if not token:
-        print("Failed to refresh access token. Exiting.")
+        logging.error("Failed to refresh access token. Exiting.")
         return
 
-    # Fetch detailed activities including descriptions
-    activities = fetch_detailed_activities(token)
-    filtered_activities = filter_rollerski_activities(activities)
-    existing_ids = get_existing_workout_ids("templates/action-journal.html")
-    new_activities = filter_new_workouts(filtered_activities, existing_ids)
-    new_snippets = [generate_html_snippet(a) for a in new_activities]
-    prepend_new_workouts("templates/action-journal.html", new_snippets)
+    summary_activities = fetch_summary_activities(token)
+    existing_ids = get_existing_workout_ids(HTML_FILE_PATH)
+    new_ids = [str(a["id"]) for a in summary_activities if str(a["id"]) not in existing_ids]
+    detailed_activities = fetch_detailed_activities(token, new_ids)
+
+    filtered_activities = filter_rollerski_activities(detailed_activities)
+    new_snippets = [generate_html_snippet(a) for a in filtered_activities]
+    prepend_new_workouts(HTML_FILE_PATH, new_snippets)
+
 
 if __name__ == "__main__":
     main()
