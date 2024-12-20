@@ -1,5 +1,6 @@
 import requests
 import os
+import re
 from datetime import datetime
 
 # Strava API setup
@@ -51,7 +52,7 @@ def filter_rollerski_activities(activities):
 
 # Generate HTML snippet
 def generate_html_snippet(activity):
-    activity_url = f"https://www.strava.com/activities/{activity['id']}"  # Construct URL using the activity ID
+    activity_url = f"https://www.strava.com/activities/{activity['id']}"
     template = f"""
     <div class="workout-card">
         <h2>{activity["name"]}</h2>
@@ -67,6 +68,31 @@ def generate_html_snippet(activity):
     """
     return template
 
+# Extract existing workout IDs
+def get_existing_workout_ids(file_path):
+    try:
+        with open(file_path, "r") as file:
+            content = file.read()
+            return re.findall(r"https://www.strava.com/activities/(\d+)", content)
+    except FileNotFoundError:
+        print(f"{file_path} not found. Assuming no existing workouts.")
+        return []
+
+# Filter new workouts
+def filter_new_workouts(activities, existing_ids):
+    return [a for a in activities if str(a["id"]) not in existing_ids]
+
+# Prepend new workouts
+def prepend_new_workouts(file_path, new_snippets):
+    try:
+        with open(file_path, "r+") as file:
+            existing_content = file.read()
+            file.seek(0)
+            file.write("\n".join(new_snippets) + "\n" + existing_content)
+    except FileNotFoundError:
+        print(f"{file_path} not found. Creating a new file.")
+        with open(file_path, "w") as file:
+            file.write("\n".join(new_snippets))
 
 # Main function
 def main():
@@ -77,15 +103,10 @@ def main():
     
     activities = fetch_activities(token)
     filtered_activities = filter_rollerski_activities(activities)
-    snippets = [generate_html_snippet(a) for a in filtered_activities]
-
-    try:
-        with open("templates/action-journal.html", "r+") as file:
-            content = file.read()
-            file.seek(0)
-            file.write("\n".join(snippets) + "\n" + content)
-    except FileNotFoundError as e:
-        print(f"Error updating action-journal.html: {e}")
+    existing_ids = get_existing_workout_ids("templates/action-journal.html")
+    new_activities = filter_new_workouts(filtered_activities, existing_ids)
+    new_snippets = [generate_html_snippet(a) for a in new_activities]
+    prepend_new_workouts("templates/action-journal.html", new_snippets)
 
 if __name__ == "__main__":
     main()
