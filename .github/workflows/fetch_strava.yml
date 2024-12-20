@@ -3,7 +3,7 @@ name: Fetch Strava Data
 on:
   schedule:
     - cron: "0 8,13,18 * * *" # Runs at 0800, 1300, and 1800 GMT-8 daily
-    workflow_dispatch: # Allows manual runs
+  workflow_dispatch: # Allows manual runs
 
 jobs:
   fetch-data:
