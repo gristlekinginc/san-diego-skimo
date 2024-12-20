@@ -64,7 +64,7 @@ def fetch_my_activities():
     print("API Response Status Code:", response.status_code)
     
     if response.status_code == 401:
-        print("Error: Unauthorized. Check access token permissions.")
+        print("Error: Unauthorized, 401. Check access token or scope permissions.")
         raise Exception("401 Unauthorized - Check access token or scope permissions.")
     
     response.raise_for_status()
