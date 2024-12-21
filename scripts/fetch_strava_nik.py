@@ -115,7 +115,6 @@ def generate_html_snippet(activity: Dict[str, Any]) -> str:
         <p><strong>Moving Time:</strong> {activity["moving_time"] // 60} min</p>
         <p><strong>Avg HR:</strong> {activity.get("average_heartrate", "N/A")}</p>
         <p><strong>Max HR:</strong> {activity.get("max_heartrate", "N/A")}</p>
-        <p><strong>Description:</strong> {description}</p>
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
