@@ -103,21 +103,33 @@ def filter_rollerski_activities(activities: List[Dict[str, Any]]) -> List[Dict[s
 
 def generate_html_snippet(activity: Dict[str, Any]) -> str:
     """Generate an HTML snippet for a given activity."""
+    def format_moving_time(total_seconds: int) -> str:
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        
+        if hours > 0:
+            return f"{hours}:{minutes:02d}:{seconds:02d}"
+        else:
+            return f"{minutes}:{seconds:02d}"
+
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
     description = activity.get("description", "No description.")
     formatted_date = datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")
+    
     return f"""
     <div class="workout-card">
         <h2>{activity.get("name", "Untitled")}</h2>
         <p><strong>Date:</strong> {formatted_date}</p>
         <p><strong>Distance:</strong> {activity["distance"] / 1000:.2f} km</p>
         <p><strong>Elevation Gain:</strong> {activity["total_elevation_gain"]} m</p>
-        <p><strong>Moving Time:</strong> {activity["moving_time"] // 60} min</p>
+        <p><strong>Moving Time:</strong> {format_moving_time(activity["moving_time"])}</p>
         <p><strong>Avg HR:</strong> {activity.get("average_heartrate", "N/A")}</p>
         <p><strong>Max HR:</strong> {activity.get("max_heartrate", "N/A")}</p>
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
+
 
 
 def get_existing_workout_ids(file_path: str) -> List[str]:
