@@ -115,7 +115,6 @@ def generate_html_snippet(activity: Dict[str, Any]) -> str:
     distance_miles = activity["distance"] * 0.000621371
     elevation_feet = activity["total_elevation_gain"] * 3.28084
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
-    description = activity.get("description", "No description.")
     formatted_date = datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")
     
     return f"""
@@ -144,6 +143,7 @@ def get_existing_workout_ids(file_path: str) -> List[str]:
         logging.info(f"{file_path} not found. Assuming no existing workouts.")
         return []
 
+
 def prepend_new_workouts(file_path: str, new_snippets: List[str]) -> None:
     """Prepend new workout snippets to the HTML file."""
     if not new_snippets:
@@ -154,7 +154,6 @@ def prepend_new_workouts(file_path: str, new_snippets: List[str]) -> None:
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
 
-        # Replace the entire workout-cards section, including template placeholders
         updated_section = f"<section id=\"workout-cards\">\n{''.join(new_snippets)}\n</section>"
         updated_content = re.sub(
             r"<section id=\"workout-cards\">.*?</section>",
@@ -170,30 +169,6 @@ def prepend_new_workouts(file_path: str, new_snippets: List[str]) -> None:
         logging.warning(f"{file_path} not found. Creating a new file with basic structure.")
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Journal</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <nav class="navbar">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="action-journal.html">Action Journal</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="faq.html">FAQ</a></li>
-        </ul>
-    </nav>
-    <h1>Action Journal</h1>
-    <section id="workout-cards">
-        {''.join(new_snippets)}
-    </section>
-</body>
-</html>""")
-
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
