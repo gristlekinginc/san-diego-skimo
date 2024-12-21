@@ -118,7 +118,7 @@ def generate_html_snippet(activity: Dict[str, Any]) -> str:
     formatted_date = datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")
     
     return f"""
-    <div class="workout-card">
+    <div class="card">
         <h2>{activity.get("name", "Untitled")}</h2>
         <p><strong>Date:</strong> {formatted_date}</p>
         <p><strong>Distance:</strong> {activity["distance"] / 1000:.2f} km</p>
