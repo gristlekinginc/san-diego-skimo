@@ -9,6 +9,8 @@
         margin: 5px 0;
     }
 }
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 /* Regular Styling */
 body {
@@ -21,6 +23,8 @@ h1 {
     color: #ff8f70;
     font-family: "VT323", monospace;
     text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px #000000;
 }
 
 .workout-card {
