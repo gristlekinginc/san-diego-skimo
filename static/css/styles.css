@@ -90,7 +90,9 @@ p, li, span, undesignated text {
   margin: 20px auto;
   max-width: 600px;
   color: #fffdff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Optional: shadow for depth */
 }
+
 
 .card h2 {
   color: #ff8f70;
