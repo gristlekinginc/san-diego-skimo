@@ -163,3 +163,9 @@ footer a:hover {
   }
 }
 <link rel="stylesheet" href="static/css/styles.css?v=2">
+
+
+/* Adjust header margin to account for fixed navbar */
+header {
+    margin-top: 2rem; /* Prevents overlap with the fixed navbar */
+}
