@@ -65,6 +65,7 @@ p, li, span, undesignated text {
   list-style: none;
   margin: 0;
   padding: 0;
+  justify-content: center;
 }
 
 .navbar li {
