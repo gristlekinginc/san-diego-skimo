@@ -17,6 +17,52 @@
     </nav>
     <h1>Action Journal</h1>
     <section id="workout-cards">
+
+    <div class="card">
+        <h2>Night Ski</h2>
+        <p><strong>Date:</strong> December 21, 2024</p>
+        <p><strong>Distance:</strong> 1.66 km</p>
+        <p><strong>Elevation Gain:</strong> 75.5 m</p>
+        <p><strong>Moving Time:</strong> 12:35</p>
+        <p><strong>Avg HR:</strong> 149.5</p>
+        <p><strong>Max HR:</strong> 158.0</p>
+        <a href="https://www.strava.com/activities/13158450039" target="_blank">View on Strava</a>
+    </div>
+    
+    <div class="card">
+        <h2>Roller-ski the 15 incline to Adams</h2>
+        <p><strong>Date:</strong> December 18, 2024</p>
+        <p><strong>Distance:</strong> 1.66 km</p>
+        <p><strong>Elevation Gain:</strong> 75.7 m</p>
+        <p><strong>Moving Time:</strong> 12:51</p>
+        <p><strong>Avg HR:</strong> 152.6</p>
+        <p><strong>Max HR:</strong> 158.0</p>
+        <a href="https://www.strava.com/activities/13138801147" target="_blank">View on Strava</a>
+    </div>
+    
+    <div class="card">
+        <h2>A tentative foray into ski hill training in San Diego</h2>
+        <p><strong>Date:</strong> December 06, 2024</p>
+        <p><strong>Distance:</strong> 1.57 km</p>
+        <p><strong>Elevation Gain:</strong> 65.9 m</p>
+        <p><strong>Moving Time:</strong> 12:01</p>
+        <p><strong>Avg HR:</strong> 166.9</p>
+        <p><strong>Max HR:</strong> 176.0</p>
+        <a href="https://www.strava.com/activities/13061109697" target="_blank">View on Strava</a>
+    </div>
+    
+    <div class="card">
+        <h2>Ski to work day</h2>
+        <p><strong>Date:</strong> August 16, 2024</p>
+        <p><strong>Distance:</strong> 1.34 km</p>
+        <p><strong>Elevation Gain:</strong> 0.0 m</p>
+        <p><strong>Moving Time:</strong> 12:31</p>
+        <p><strong>Avg HR:</strong> 96.1</p>
+        <p><strong>Max HR:</strong> 110.0</p>
+        <a href="https://www.strava.com/activities/12173217907" target="_blank">View on Strava</a>
+    </div>
+    
+<section id="workout-cards">
     {% for workout in workouts %}
     <div class="card">
         <h2>{{ workout.title }}</h2>
@@ -29,7 +75,7 @@
         <a href="{{ workout.strava_link }}" target="_blank">View on Strava</a>
     </div>
     {% endfor %}
-</section>
+</section></section>
 
 </body>
 </html>
