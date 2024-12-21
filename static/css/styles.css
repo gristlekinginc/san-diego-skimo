@@ -23,30 +23,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Header Styles */
-header {
-  background-color: #000000;
-  border-bottom: 2px solid #5544df;
-  text-align: center;
-  padding: 20px 0;
-}
-
-header h1 {
-  color: #ff8f70;
-  font-family: 'VT323', monospace;
-  font-size: 3rem;
-  margin: 0;
-}
-
-header nav a {
-  margin: 0 15px;
-  color: #60ccef;
-}
-
-header nav a:hover {
-  color: #ff8f70;
-}
-
 /* Typography */
 h1 {
   color: #ff8f70;
@@ -55,16 +31,54 @@ h1 {
 
 h2 {
   color: #60ccef;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
 }
 
 h3 {
   color: #c9c9c9;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
 }
 
-p {
-  max-width: 90%;
-  margin: 0 auto;
+p, li, span, undesignated text {
+  color: #fffdff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
   padding: 10px 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.navbar ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar li {
+  margin: 0 15px;
+}
+
+.navbar a {
+  color: #60ccef;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  color: #ff8f70;
 }
 
 /* Workout Cards */
@@ -75,14 +89,17 @@ p {
   padding: 15px;
   margin: 20px auto;
   max-width: 600px;
+  color: #fffdff;
 }
 
 .card h2 {
   color: #ff8f70;
+  font-family: 'VT323', monospace;
 }
 
 .card a {
   color: #60ccef;
+  font-family: 'Poppins', sans-serif;
 }
 
 .card a:hover {
@@ -130,12 +147,16 @@ footer a:hover {
     max-width: 100%;
   }
 
+  .navbar {
+    flex-wrap: wrap;
+  }
+
   .navbar ul {
-    flex-direction: column;
-    padding: 0;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .navbar li {
-    margin: 5px 0;
+    margin: 0 5px;
   }
 }
