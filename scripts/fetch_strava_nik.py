@@ -107,12 +107,13 @@ def generate_html_snippet(activity: Dict[str, Any]) -> str:
         hours = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
         seconds = total_seconds % 60
-        
         if hours > 0:
             return f"{hours}:{minutes:02d}:{seconds:02d}"
         else:
             return f"{minutes}:{seconds:02d}"
 
+    distance_miles = activity["distance"] * 0.000621371
+    elevation_feet = activity["total_elevation_gain"] * 3.28084
     activity_url = f"https://www.strava.com/activities/{activity['id']}"
     description = activity.get("description", "No description.")
     formatted_date = datetime.strptime(activity["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%B %d, %Y")
@@ -121,15 +122,14 @@ def generate_html_snippet(activity: Dict[str, Any]) -> str:
     <div class="card">
         <h2>{activity.get("name", "Untitled")}</h2>
         <p><strong>Date:</strong> {formatted_date}</p>
-        <p><strong>Distance:</strong> {activity["distance"] / 1000:.2f} km</p>
-        <p><strong>Elevation Gain:</strong> {activity["total_elevation_gain"]} m</p>
+        <p><strong>Distance (miles):</strong> {distance_miles:.2f} miles</p>
+        <p><strong>Elevation Gain (feet):</strong> {elevation_feet:.0f} ft</p>
         <p><strong>Moving Time:</strong> {format_moving_time(activity["moving_time"])}</p>
         <p><strong>Avg HR:</strong> {activity.get("average_heartrate", "N/A")}</p>
         <p><strong>Max HR:</strong> {activity.get("max_heartrate", "N/A")}</p>
         <a href="{activity_url}" target="_blank">View on Strava</a>
     </div>
     """
-
 
 
 def get_existing_workout_ids(file_path: str) -> List[str]:
