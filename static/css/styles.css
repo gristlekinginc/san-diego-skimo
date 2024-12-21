@@ -168,5 +168,12 @@ footer a:hover {
 
 /* Adjust header margin to account for fixed navbar */
 header {
-    margin-top: 2rem; /* Prevents overlap with the fixed navbar */
+    margin-top: 3rem; /* Adjust based on the navbar's height */
+}
+
+header h1 {
+    margin-top: 0; /* Additional spacing if needed */
+}
+main {
+    margin-top: 3rem; /* Ensures main content is not overlapped */
 }
