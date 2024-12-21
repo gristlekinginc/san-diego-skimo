@@ -1,3 +1,6 @@
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 /* Mobile Styling */
 @media (max-width: 768px) {
     .navbar ul {
@@ -9,8 +12,6 @@
         margin: 5px 0;
     }
 }
-/* Font Imports */
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 /* Regular Styling */
 body {
