@@ -1,24 +1,26 @@
+
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Poppins:wght@400&display=swap');
 
-/* General Reset and Base Styles */
+/* Reset and Base Styles */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   background-color: #000000;
   color: #fffdff;
   font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 1rem; /* Adds padding around the body */
   line-height: 1.6;
+  padding: 1rem;
 }
 
+/* Links */
 a {
   color: #60ccef;
   text-decoration: none;
 }
-
 a:hover {
   text-decoration: underline;
 }
@@ -29,82 +31,49 @@ a:hover {
   justify-content: center;
   align-items: center;
   background-color: #000;
-  padding: 10px 0;
+  padding: 1rem;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
 }
-
 .navbar ul {
   display: flex;
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
-
 .navbar li {
-  margin: 0 15px;
+  margin: 0 1rem;
 }
-
-.navbar a {
-  color: #60ccef;
-  font-family: 'Poppins', sans-serif;
-  text-decoration: none;
-}
-
 .navbar a:hover {
   color: #ff8f70;
 }
 
 /* Header */
 header {
-  margin-top: 5rem; /* Push content below navbar */
+  margin-top: 4rem; /* Ensure sufficient space below navbar */
   text-align: center;
 }
-
 header h1 {
-  font-size: 2.5rem;
-  color: #ff8f70;
   font-family: 'VT323', monospace;
-  margin: 0;
+  color: #ff8f70;
+  font-size: 2.5rem;
 }
 
-/* Main Content */
-main {
-  margin-top: 2rem; /* Ensure spacing below header */
-  padding: 1rem; /* Add padding for balance */
+/* Workout Cards */
+.card {
+  border: 2px solid #60ccef;
+  padding: 1rem;
+  margin: 1rem auto;
+  border-radius: 8px;
+  max-width: 600px;
+  background: #1a1a1a;
 }
-
-/* Footer */
-footer {
-  background-color: #000000;
-  color: #c9c9c9;
-  padding: 10px;
-  text-align: center;
-  border-top: 2px solid #5544df;
-}
-
-footer a:hover {
-  text-decoration: underline;
+.card h2 {
   color: #ff8f70;
 }
-
-/* Mobile Styling */
-@media (max-width: 768px) {
-  header h1 {
-    font-size: 2rem;
-  }
-
-  .navbar ul {
-    flex-direction: column; /* Stack links vertically on mobile */
-  }
-
-  .navbar li {
-    margin: 5px 0;
-  }
-
-  main {
-    padding: 0.5rem;
-  }
+.card p {
+  margin: 0.5rem 0;
+}
+.card a {
+  color: #60ccef;
 }
