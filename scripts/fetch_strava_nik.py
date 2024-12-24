@@ -4,6 +4,7 @@ import re
 import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from bs4 import BeautifulSoup  # Added for HTML parsing
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s]: %(message)s')
@@ -84,6 +85,17 @@ def filter_rollerski_activities(activities: List[Dict[str, Any]]) -> List[Dict[s
     return filtered
 
 
+def extract_existing_links(file_path: str) -> set:
+    """Extract existing workout links from the HTML file."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            soup = BeautifulSoup(file, "html.parser")
+            return {a['href'] for a in soup.select("#workout-cards a[href]")}
+    except FileNotFoundError:
+        logging.warning(f"{file_path} not found. Starting fresh.")
+        return set()
+
+
 def generate_html_snippet(activity: Dict[str, Any]) -> str:
     """Generate an HTML snippet for a given activity."""
     def format_moving_time(total_seconds: int) -> str:
@@ -122,19 +134,15 @@ def prepend_new_workouts(file_path: str, new_snippets: List[str]) -> None:
 
     try:
         with open(file_path, "r", encoding="utf-8") as file:
-            content = file.read()
+            soup = BeautifulSoup(file, "html.parser")
 
-        match = re.search(r"<main id=\"workouts\">(.*?)</main>", content, flags=re.DOTALL)
-        if match:
-            existing_content = match.group(1)
-            updated_section = f"<main id=\"workouts\">\n<section id=\"workout-cards\">\n{''.join(new_snippets)}\n{existing_content}\n</section>\n</main>"
-            updated_content = content.replace(match.group(0), updated_section)
-        else:
-            updated_section = f"<main id=\"workouts\">\n<section id=\"workout-cards\">\n{''.join(new_snippets)}\n</section>\n</main>"
-            updated_content = content.replace("</body>", f"{updated_section}\n</body>")
+        workout_section = soup.select_one("#workout-cards")
+        if workout_section:
+            for snippet in reversed(new_snippets):
+                workout_section.insert(0, BeautifulSoup(snippet, "html.parser"))
 
         with open(file_path, "w", encoding="utf-8") as file:
-            file.write(updated_content)
+            file.write(str(soup))
         logging.info("Prepended new workouts successfully.")
     except FileNotFoundError:
         logging.error(f"{file_path} not found. Unable to prepend workouts.")
@@ -147,8 +155,10 @@ def main():
         return
 
     summary_activities = fetch_summary_activities(token)
+    existing_links = extract_existing_links(HTML_FILE_PATH)
     filtered_activities = filter_rollerski_activities(summary_activities)
-    new_snippets = [generate_html_snippet(a) for a in filtered_activities]
+    new_activities = [a for a in filtered_activities if f"https://www.strava.com/activities/{a['id']}" not in existing_links]
+    new_snippets = [generate_html_snippet(a) for a in new_activities]
     prepend_new_workouts(HTML_FILE_PATH, new_snippets)
 
 
